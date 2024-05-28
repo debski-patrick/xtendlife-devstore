@@ -1,0 +1,9 @@
+{% if page.metafields["custom_fields"]["health_cat_list"] != blank %}
+  <div class="custom-field custom-field__health-cat-list custom-field__type--text">
+    <h3 class="custom-field--title">Health Category List</h3>
+    <div class="custom-field--value">
+      {{ page.metafields["custom_fields"]["health_cat_list"] }}
+
+    </div>
+  </div>
+{% endif %}

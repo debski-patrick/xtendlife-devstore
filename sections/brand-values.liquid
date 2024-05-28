@@ -1,0 +1,54 @@
+<link rel="preload" href="{{ 'brand-values.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'brand-values.css' | asset_url }}">
+
+{%- if section.blocks.size > 0 -%}
+  <div data-section-id="{{ section.id }}" data-section-type="brand-values-section">
+    <div class="brand-values-container">
+
+      {%- for block in section.blocks -%}
+        <div class="brand-value" {{ block.shopify_attributes }}>
+
+          {%- if block.settings.image != blank -%}
+            <img class="brand-value__image" src="{{ block.settings.image | img_url: '65x' }}"
+              srcset="{{ block.settings.image | img_url: '65x' }} 1x,
+              {{ block.settings.image | img_url: '65x', scale: 2 }} 2x"
+              alt="{{ block.settings.title }}" data-image-alt="{{ block.settings.image.alt }}">
+          {%- endif -%}
+
+          {%- if block.settings.title != blank -%}
+            <span class="brand-value__title">
+              {{ block.settings.title }}
+            </span>
+          {%- endif -%}
+
+        </div>
+      {%- endfor -%}
+
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Brand Values",
+    "class": "brand-values-section",
+    "blocks": [
+      {
+        "name": "Item",
+        "type": "item",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["health_products"] != blank %}
+  <div class="custom-field custom-field__health-products custom-field__type--product-reference">
+    <h3 class="custom-field--title">Health Products</h3>
+    <div class="custom-field--value">  
+    {% assign product_ref = all_products[collection.metafields["custom_fields"]["health_products"]] %}
+    {{ product_ref.title | link_to: product_ref.url }}
+    </div>
+  </div>
+{% endif %}

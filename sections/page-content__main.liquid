@@ -1,0 +1,410 @@
+{% if page.handle contains 'our-quality'  %}
+  <link rel="preload" href="{{ 'certifications.css' | asset_url }}" as="style">
+  <link rel="stylesheet" href="{{ 'certifications.css' | asset_url }}">
+{% endif %}
+{% if page.handle contains 'newsletter' or  page.handle contains 'website-faqs' %}
+  <script src="//static.xtend-life.com/shopify/shared/xtendlife.min.js"></script>
+  <style>
+    .page_cnt h3,
+    .page_cnt p{
+      display: block;
+      float: left;
+      width: 100%;
+      margin-top: 0;
+    }
+    hr{
+      width: 100%;
+      margin-top: 0;
+    }
+    .accordion-parent{
+      display: block;
+      float: left;
+      width: calc(100% - 10px);
+      margin-top: 0;
+    }
+    h3.accordion-title{
+      width: calc(100% - 10px);
+    }
+    .accordion-default .accordion-title a{
+      border-radius: 4px;
+    }
+  </style>
+  {% endif %}
+{% comment %}
+** Page content **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% assign animation = section.settings.animation | default: 'none' %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  .page_cnt h2{
+    font-size: 25px;
+    color: #005895;
+    text-align: center;
+    font-weight: 600;
+    margin: 25px 0 20px;
+    float: left;
+    display: block;
+    width: 100%;
+  }
+  @media only screen and (max-width: 767px){
+    .page_cnt h2{
+      font-size: 16.5px;
+    }
+    .page_cnt p {
+      font-size: .875em;
+    }
+  }
+  {% render 'css-loop',
+          css: custom_css,
+          id: id
+  %}
+{% endstyle %}
+
+<section class="section page_cnt
+        {{ css_class }}
+        is-width-{{ width }}"
+        {% if animation != "none" %}
+          data-scroll-class="{{ animation }}"
+        {% endif %}>
+  <div class="container page__container">
+    {%- if section.settings.show_heading != blank -%}
+      {% render 'heading',
+              title: page.title,
+              heading_tag: 'h1',
+              context: 'page',
+              text_alignment: section.settings.heading_alignment
+      %}
+    {%- endif -%}
+    <div class="page__content content container {% if settings.table_styles_enabled %} table is-striped is-bordered {% endif %}">
+      {% render 'page-multi-column', content: page.content %}
+    </div>
+  </div>
+</section>
+
+{% if page.metafields.custom_fields.health_cat_list != blank %}
+<section class="max-width-container">
+  <ul class="collection-list">
+      {% for link in linklists[page.metafields.custom_fields.health_cat_list].links %}
+        {% unless link.object == empty %}
+          <li class="collection-list__item">
+            <h3 class="collection-list__item-title">{{ link.object.title }}</h3>
+            {% if link.object.metafields.custom_fields.excerpt != blank %}
+              <p class="collection-list__item-content">{{ link.object.metafields.custom_fields.excerpt }}</p>
+            {% endif %}
+            <div><a class="button button--primary btn collection-list__item-link" href="{{ link.url }}">{{ link.title }}</a>
+          </li>
+        {% endunless %}
+      {% endfor %}   
+  </ul>
+</section>
+{% endif %}
+<style>
+    .collection-list {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -moz-box;
+      display: -moz-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      -moz-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+      -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+      -moz-box-pack: justify;
+      -webkit-justify-content: space-between;
+      -moz-justify-content: space-between;
+      justify-content: space-between;
+      list-style: none;
+      margin: 50px 0;
+      padding: 0 10px;
+    }
+      .collection-list__item {
+      width: 100%;
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid #e8e8e8;
+    }
+  .collection-list__item-title {
+	font-size: .875rem;
+	margin-bottom: 16px;
+}
+  .collection-list__item-link {
+	padding: 14px 54px;
+	font-size: .875rem;
+	white-space: normal;
+}
+  .collection-list__item-content {
+	margin-bottom: 27px;
+	font-size: .875rem;
+}
+    @media only screen and (min-width: 768px){
+      .collection-list__item {
+        width: 45%;
+      }
+    }
+
+</style>
+{% if page.metafields.custom_fields.health_articles != blank %}  
+  {% assign article_refs = page.metafields.custom_fields.health_articles | split: '|' %}
+  <div class="section collection-blog">
+    <div class="container">
+      {% render 'heading',
+              title: 'Health Articles',
+      heading_tag: 'h3',
+      context: 'featured-blog',
+      text_alignment: 'center',
+      url: blog.url
+      %}
+    </div>
+  <div class="container">
+  {% for article_handle in article_refs limit: 3 %}
+    {% assign article_blog_handle = article_handle | replace: '.', '/' %}
+	{% assign article = articles[article_blog_handle] %}
+    <div class="featured-article blog-card {% render 'column-width', value: 3 %} columns article card show-border-{{ section.settings.show-border }} medium-down--one-whole has-margin-bottom ">
+      {% if article.image != blank %}
+      <div class="card-image blog-card__image">
+        <figure class="image">
+          <a class="blog-card__link" href="{{ article.url }}" title="{{ article.title | escape }}">
+            {% render 'image-element',
+                            image: article.image,
+            alt: article.image.alt,
+            additional_classes: 'blog-card__image'
+            %}
+          </a>
+        </figure>
+      </div>
+      {% endif %}
+      <div class="card-content blog-card__content">
+        <div class="media">
+          <div class="media-content">
+            <h3 class="title">
+              <a class="featured-article--link" href="{{ article.url }}" title="{{ article.title | escape }}">{{ article.title }}</a>
+            </h3>
+          </div>
+        </div>
+        {% if article.content != blank %}      
+        <div class="excerpt">
+          {{ article.content | strip_html | truncate: 250 }}        
+        </div>
+        {% endif %}
+      </div>     
+      <div class="blog-card__read-more">
+        {% render 'button',
+                      label: "Read More",
+        href: article.url,
+        type: "link",
+        style: "button--link-style"
+        %}
+      </div>
+      
+    </div> 
+  {% endfor %}
+  </div>
+  </div>
+  {% endif %}
+  <script>
+     {%if template.suffix contains 'affiliate' %}
+ 
+   setTimeout(function () {
+      if (window.location.href.indexOf("?video_popup=1") > -1) {
+        //$('.overlay').show();
+        $('.video-1 .plus_popup').find('.popup-1').show();
+      }
+       if (window.location.href.indexOf("?video_popup=2") > -1) {
+        //$('.overlay').show();
+        $('.video-2 .plus_popup').find('.popup-2').show();
+      }
+                    if (window.location.href.indexOf("?video_popup=3") > -1) {
+        //$('.overlay').show();
+        $('.video-3 .plus_popup').find('.popup-3').show();
+      }
+                    if (window.location.href.indexOf("?video_popup=4") > -1) {
+        //$('.overlay').show();
+        $('.video-4 .plus_popup').find('.popup-4').show();
+      }
+    }, 2000);
+    $('.vid1').click(function(e){
+      e.preventDefault();
+      $('.overlay').show();
+      $('.popup-4').show();
+    });
+      $('.video-1 a').click(function(e){
+      e.preventDefault();
+      $('.overlay').show();
+      $('.popup-1').show();
+    });
+                  $('.video-2 a').click(function(e){
+      e.preventDefault();
+      $('.overlay').show();
+      $('.popup-2').show();
+    });
+           $('.video-3 a').click(function(e){
+      e.preventDefault();
+      $('.overlay').show();
+      $('.popup-3').show();
+    });       
+    $('.clsclick').click(function(){
+        $('.popup-4').fadeOut(300);
+        $('.popup-3').fadeOut(300);
+        $('.popup-2').fadeOut(300);
+        $('.popup-1').fadeOut(300);
+        $('.overlay').fadeOut(300);
+    });
+    $('.overlay').click(function(){
+        $('.popup-4').fadeOut(300);
+        $('.popup-3').fadeOut(300);
+        $('.popup-2').fadeOut(300);
+        $('.popup-1').fadeOut(300);
+        $('.overlay').fadeOut(300);
+    });
+    $('.vid1').click(function(){
+      const video = document.querySelector("#video-4");
+      video.contentWindow.postMessage('{"method":"play"}', '*');
+    });
+    $('.video-close-4 svg').click(function(){
+      $(".overlay").trigger("click");
+      return false;
+    });
+               $('.video-1').click(function(){
+            const video = document.querySelector("#video-1");
+            video.contentWindow.postMessage('{"method":"play"}', '*');
+          });
+          $('.video-close-1 svg').click(function(){
+            $(".overlay").trigger("click");
+            return false;
+          });
+                        $('.video-2').click(function(){
+            const video = document.querySelector("#video-2");
+            video.contentWindow.postMessage('{"method":"play"}', '*');
+          });
+          $('.video-close-2 svg').click(function(){
+            $(".overlay").trigger("click");
+            return false;
+          });
+                        $('.video-3').click(function(){
+            const video = document.querySelector("#video-3");
+            video.contentWindow.postMessage('{"method":"play"}', '*');
+          });
+          $('.video-close-3 svg').click(function(){
+            $(".overlay").trigger("click");
+            return false;
+          });
+    $('.overlay').click(function(){
+      const video4 = document.querySelector("#video-4");
+      video4.contentWindow.postMessage('{"method":"pause"}', '*');  
+                          const video1 = document.querySelector("#video-1");
+            video1.contentWindow.postMessage('{"method":"pause"}', '*'); 
+                          const video2 = document.querySelector("#video-2");
+            video2.contentWindow.postMessage('{"method":"pause"}', '*'); 
+                          const video3 = document.querySelector("#video-3");
+            video3.contentWindow.postMessage('{"method":"pause"}', '*'); 
+    });
+		  
+    {% endif %}
+  
+  </script>
+{% schema %}
+  {
+    "name": "Page content",
+    "class": "page-main",
+    "templates": ["page"],
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_heading",
+        "label": "Show page title",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "heading_alignment",
+        "label": "Heading alignment",
+        "default": "left",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

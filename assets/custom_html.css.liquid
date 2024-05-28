@@ -1,0 +1,102 @@
+  /*Brand Pillars*/
+  .brand-pillars .brand-pillar .brand-pillar__title {
+    font-size: 20px;
+    color: #fff;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
+    text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+  }
+  .brand-pillars {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    -moz-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    justify-content: space-between;
+    padding: 1em 0;
+  }
+  .brand-pillars .brand-pillar a {
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+  }
+  .brand-pillars .brand-pillar {
+    text-align: center;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 1 30%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 1 30%;
+    -ms-flex: 0 1 30%;
+    flex: 0 1 30%;
+    margin: 0 5px;
+    padding: 2px 10px;
+  }
+  .brand-pillars .brand-pillar a {
+    text-decoration: none;
+  }
+  .brand-pillars .brand-pillar .brand-pillar__icon {
+    font-size: 1.375em;
+    margin: .2em 0;
+  }
+  @media only screen and (min-width: 768px){
+    .brand-pillars .brand-pillar:first-child {
+      padding-left: 0;
+    }
+    .brand-pillars .brand-pillar .brand-pillar__title {
+      margin-left: 10px;
+      text-align: left;
+    }
+  }
+  @media only screen and (max-width: 1199px){
+    .new_pillars_hero_collectionlist .main-hero__pillars .brand-pillar__title {
+      display: block;
+    }
+  }
+  @media only screen and (max-width: 1024px){
+    .brand-pillars .brand-pillar .brand-pillar__title {
+      font-size: 11px;
+    }
+   .brand-pillars .brand-pillar {
+      padding: 2px 15px;
+    }
+  }
+  @media only screen and (max-width: 767px){
+    .brand-pillars .brand-pillar {
+      padding: 2px 9px;
+    }
+    .brand-pillars .brand-pillar a {
+      display: flex;
+      align-items: center;
+    }
+    .new_pillars_hero_collectionlist .main-hero__pillars .brand-pillar__icon {
+      display: block;
+    }
+    .new_pillars_hero_collectionlist .main-hero__pillars .brand-pillar__icon img {
+      width: 34px;
+      height: 34px;
+    }
+    .brand-pillars .brand-pillar .brand-pillar__title {
+      text-align: left;
+      padding-left: 5px;
+    }
+  }
+  @media only screen and (max-width: 660px){
+    .brand-pillars .brand-pillar{
+      flex: unset;
+      margin: 0 auto;
+    }
+    .brand-pillars .brand-pillar .brand-pillar__title {
+	font-size: 9px;
+  }
+  .brand-pillars{
+    flex-wrap: wrap;
+  }
+  }

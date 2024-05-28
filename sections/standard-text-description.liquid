@@ -1,0 +1,159 @@
+{%- assign section_id = section.id -%}
+{%- assign header = section.settings.header -%}
+{%- assign header_color = section.settings.color_title -%}
+{%- assign content_area = section.settings.content_area -%}
+{%- assign content_color = section.settings.color_content -%}
+{%- assign text_alignment = section.settings.align_text -%}
+{%- assign background_image = section.settings.bgimage -%}
+{%- assign background_color = section.settings.bgcolor -%}
+{%- assign background_cover = section.settings.bgwidth -%}
+
+<link rel="preload" href="{{ 'standard-text-description.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'standard-text-description.css' | asset_url }}">
+<!--- Content Area ---->
+<style>
+  .text_description_page_section.block-{{section.id}} {
+      {% if background_cover == "full" %}
+        {% if background_image != blank %}          
+          background: url({{background_image | img_url: 'master'}}) !important;
+          background-size: cover !important;
+          background-repeat: no-repeat !important;
+          background-position: center center !important;
+          padding: 120px 0 120px 0;
+        {% else %}
+          background-color:{{ background_color }};
+          padding: 60px 0 60px 0;
+        {% endif %}    
+      {% endif %}      
+    }
+  .section-{{section_id}} .quote_section-header h2 {
+    {% if background_cover == "content" %}
+      {% if background_image != blank %}          
+        background: url({{background_image | img_url: 'master'}}) !important;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+      {% else %}
+        background-color:{{ background_color }};
+      {% endif %}
+    {% endif %} 
+    color:{{header_color}};
+    margin: 0 0 30px;
+  }
+  .section-{{section_id}} .quote_section-content {
+    padding: 0 80px 0 80px;
+  }      
+  .section-{{section_id}} .quote_section-header.text-center {
+    margin: 0 0 30px;
+  }
+  .Worried-about.section-{{section_id}} {
+    color:{{content_color}};    
+  }
+  @media only screen and (max-width: 767px){
+    .section-{{section_id}} .quote_section-content {
+      padding: 0 0 0 0;
+    } 
+  }
+</style>
+<div class="text_description_page_section block-{{section_id}}">
+  <div class="Worried-about section text-center content section-{{section_id}}">
+    {% if header != blank %}
+    <div class="quote_section-header text-center">
+      <h2>{{header}}</h2>
+    </div>
+    {% endif %}
+    <div class="quote_section-content text-{{text_alignment}}">
+    {{content_area}}
+    </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Text Description V1",
+    "class": "image-textv1",
+    "settings": [
+      {
+          "type": "image_picker",
+          "id": "bgimage",
+          "label": "Background Image"
+      },
+      {
+        "type": "color",
+        "id": "bgcolor",
+        "label": "Background Color",
+        "default": "#E8E8E8"
+      },
+      {
+        "type": "select",
+        "id": "bgwidth",
+        "label": "Background cover",
+        "default": "full",
+        "options": [
+          {
+            "value": "full",
+            "label": "Full Width"
+          },
+          {
+            "value": "content",
+            "label": "Content"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "id": "header",
+        "label": "Header",
+        "default": "More Information"
+      },
+      {
+        "type": "color",
+        "id": "color_title",
+        "label": "Title Color",
+        "default": "#005895"
+      },
+      {
+        "type": "select",
+        "id": "align_text",
+        "label": "Text alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label":"Centered"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ]
+      },
+      {
+        "type": "html",
+        "id": "content_area",
+        "label": "Content"
+      },
+      {
+        "type": "color",
+        "id": "color_content",
+        "label": "Content Color",
+        "default": "#231F20"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Text",
+      "name": "Text Description V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["product_ad_title"] != blank %}
+  <div class="custom-field custom-field__product-ad-title custom-field__type--text">
+    <h3 class="custom-field--title">Product Ad Title</h3>
+    <div class="custom-field--value">
+      {{ article.metafields["custom_fields"]["product_ad_title"] }}
+
+    </div>
+  </div>
+{% endif %}

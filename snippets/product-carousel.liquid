@@ -1,0 +1,27 @@
+{% if count %}
+    {% for count in (3..6) %}
+        {% if count == 4 %}
+            {% assign js_class_init_slider = 'js-product-carousel-four' %}
+        {% endif %}
+    {% endfor %}
+{% else %}
+  {% assign js_class_init_slider = 'js-product-carousel' %}
+{% endif %}
+<section class="container collection-matrix product-grid js-filterable product-carousel max-width-container {{ js_class_init_slider }}">
+{% if handles %}
+{% for handle in handles %}
+{% assign item = all_products[handle] %}
+{% if item %}
+  {% render 'product-thumbnail',
+    align_height: '250px',
+  product: item %}
+{% endif %}
+{% endfor %}
+{% elsif products %}
+{% for item in products %}
+{% render 'product-thumbnail',
+align_height: '250px',
+  product: item %}
+{% endfor %}
+{% endif %}
+</section>

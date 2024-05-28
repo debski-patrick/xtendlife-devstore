@@ -1,0 +1,87 @@
+<link rel="preload" href="{{ 'custom_html.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'custom_html.css' | asset_url }}">
+<div class="new_pillars_hero_collectionlist" style="background: {{ section.settings.background_color }}">
+  <div class="section">
+    <div class="main-hero__pillars">
+      <div class="brand-pillars">
+        <div class="brand-pillar">
+          <a href="{{ settings.link-1 }}">
+          <div class="brand-pillar__icon">            
+            <img src="{{ settings.image-1 | img_url: 'master' }}">
+          </div>
+          <div class="brand-pillar__title">
+            {{ settings.description-1 }}
+          </div>
+          </a>
+        </div>
+        <div class="brand-pillar">
+          <a href="{{ settings.link-2 }}">
+          <div class="brand-pillar__icon">            
+            <img src="{{ settings.image-2 | img_url: 'master' }}">
+          </div>
+          <div class="brand-pillar__title">
+            {{ settings.description-2 }}
+          </div>
+          </a>
+        </div>
+       <div class="brand-pillar">
+          <a href="{{ settings.link-3 }}">
+          <div class="brand-pillar__icon">            
+            <img src="{{ settings.image-3 | img_url: 'master' }}">
+          </div>
+          <div class="brand-pillar__title">
+            {{ settings.description-3 }}
+          </div>
+          </a>
+        </div>
+        {% if settings.image-4 != blank  %}
+        <div class="brand-pillar">
+          <a href="{{ settings.link-4 }}">
+          <div class="brand-pillar__icon">            
+            <img src="{{ settings.image-4 | img_url: 'master' }}">
+          </div>
+          <div class="brand-pillar__title">
+            {{ settings.description-4 }}
+          </div>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% if section.settings.custom_html != blank %}
+<div class="custome-html">  
+  {{ section.settings.custom_html }}
+</div>
+{% endif %}
+{% schema %}
+  {
+    "name": "Brand Pillars",
+    "settings": [
+	  {
+		"type": "textarea",
+		"id": "custom_html",
+		"label": "HTMl area"
+	  },
+	  {
+		"type": "color",
+		"id": "background_color",
+		"label": "Background Color",
+        "default": "#005895"
+	  }
+	],
+	"presets":[
+      {
+        "category":"Components",
+        "name":"Brand Pillars"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

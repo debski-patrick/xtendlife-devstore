@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["above_footer_description"] != blank %}
+  <div class="custom-field custom-field__above-footer-description custom-field__type--multi-line-text-field">
+    <h3 class="custom-field--title">above footer description</h3>
+    <div class="custom-field--value">
+      {{ collection.metafields["custom_fields"]["above_footer_description"] }}
+
+    </div>
+  </div>
+{% endif %}

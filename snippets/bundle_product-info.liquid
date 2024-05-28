@@ -1,0 +1,37 @@
+<div class="bundle_pro">
+             <div class="image__container product__imageContainer">
+               <p class="discount_offr text-center">{{ discount_offer }}</p>
+               <a href="{{ product.url }}">  {%
+              render 'image-element',
+              image: product.featured_media.preview_image,
+              alt: alt_text,
+              object_fit: align_height,
+              max_height: height
+            %} {% comment %} Secondary image {% endcomment %} {% if product.media[1] != blank and settings.show_secondary_image == true %} {% if product.media[1].media_type == 'external_video' %} <div class="product-thumbnail__video secondary swap--visible video-on-hover">
+                   <div data-youtube-video>
+                     {{ product.media[1] | external_video_tag }}
+                   </div>
+                 </div> {% elsif product.media[1].media_type == 'video' %} <div class="product-thumbnail__video secondary swap--visible video-on-hover" data-html5-video>
+                   {{ product.media[1] | video_tag: controls: false }}
+                 </div> {% else %} {%
+                  render 'image-element',
+                  image: product.media[1],
+                  alt: alt_text,
+                  object_fit: align_height,
+                  max_height: height,
+                  additional_classes: 'secondary swap--visible'
+                %} {% endif %} {% endif %} </a>
+             </div>
+             <h3 class="product-grid__item-title">
+               <a href="{{ product.url }}" class="product-thumbnail__title">{{ product.title }}</a>
+             </h3>
+             <div class="bundle_smallcnt">{{ content }}</div> {%- assign product_price = product.price -%} {%- assign product_compare_at_price = product.compare_at_price_max -%} 
+             <div class="product-grid__item-price-sizing {% if item.handle == 'give-a-gift-card' %}hide{% endif %}">
+               <div class="product-grid__item-price{% if product_compare_at_price > product_price or member_price != blank %} product-grid__item-price--sale{% endif %}"> {%- if product_compare_at_price > product_price -%} <span class="product-grid__item-price-compare">{{ product_compare_at_price | money }}</span> {%- endif -%} {{ product_price | money }}
+                 <span>{{ cart.currency.iso_code }}</span> {% comment %}{%- if settings.tax-messaging != blank -%} <span class="tax-messaging">{{ settings.tax-messaging }}</span> {%- endif -%}{% endcomment %}
+               </div>
+             </div>
+              <div class="shop_nowbundle">
+               <a href="{{ product.url }}" class="productbundle-shop">Shop Now</a>
+              </div>
+</div>

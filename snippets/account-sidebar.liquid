@@ -1,0 +1,17 @@
+<h2 class="account-nav-title account-nav-title--btn" data-account-nav-btn>{{ 'customer.account.title' | t }} {{ 'layout.customer.log_out' | t | customer_logout_link | replace: '<a', '<a class="small-down--hidden"'}}<span class="down_arrow_svg hide small-down--visible">{% include 'icon-right-arrow-new' %}</span></h2>
+<nav class="account-logged-in-nav" data-account-nav>
+    <ul>
+    {% if linklists.my-account.links.size > 0 %}
+        {% for link in linklists.my-account.links %} 
+        <li class="account-nav-item">
+            <a href="{{ link.url }}">{{ link.title }}{% if link.title contains 'Orders'%} ({% paginate customer.orders by 1000 %}{{ customer.orders.size }}{% endpaginate %}){% endif %}</a>
+        </li>
+        {% endfor %}
+    {% endif %} 
+        <li class="hide small-down--visible mobile_link_style">{{ 'layout.customer.log_out' | t | customer_logout_link }}</li>
+      <!-- Begin Recharge code -->
+      <li class="account-nav-item"><a href="/tools/recurring/login/">Manage Subscriptions</a></li>
+      <!-- End Recharge code -->
+    </ul>
+</nav>
+{% include 'account-club-navigation' %}

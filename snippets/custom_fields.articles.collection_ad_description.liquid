@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["collection_ad_description"] != blank %}
+  <div class="custom-field custom-field__collection-ad-description custom-field__type--text">
+    <h3 class="custom-field--title">Collection Ad Description</h3>
+    <div class="custom-field--value">
+      {{ article.metafields["custom_fields"]["collection_ad_description"] }}
+
+    </div>
+  </div>
+{% endif %}

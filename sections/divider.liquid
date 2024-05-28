@@ -1,0 +1,32 @@
+<!-- divider -->
+<div class="padding_section" style="padding:{{section.settings.divider}};background-color:{{section.settings.divider_bg}};margin-top:-1px;"></div>
+{% schema %}
+  {
+    "name": "Divider V1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "divider",
+        "label": "Padding",
+        "default": "20px"
+      },
+      {
+        "type": "color",
+        "id": "divider_bg",
+        "label": "Background Color"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Spacing",
+      "name": "Divider V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

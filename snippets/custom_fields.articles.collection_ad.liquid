@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["collection_ad"] != blank %}
+  <div class="custom-field custom-field__collection-ad custom-field__type--collection-reference">
+    <h3 class="custom-field--title">Collection ad</h3>
+    <div class="custom-field--value">  
+      {% assign collection_ref = collections[article.metafields["custom_fields"]["collection_ad"]] %}
+      {{ collection_ref.title | link_to: collection_ref.url }}
+    </div>
+  </div>
+{% endif %}

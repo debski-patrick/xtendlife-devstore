@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["old_article_id"] != blank %}
+  <div class="custom-field custom-field__old-article-id custom-field__type--text">
+    <h3 class="custom-field--title">Old Article Id</h3>
+    <div class="custom-field--value">
+      {{ article.metafields["custom_fields"]["old_article_id"] }}
+
+    </div>
+  </div>
+{% endif %}

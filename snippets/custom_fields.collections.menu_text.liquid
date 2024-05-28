@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["menu_text"] != blank %}
+  <div class="custom-field custom-field__menu-text custom-field__type--text">
+    <h3 class="custom-field--title">Menu Text</h3>
+    <div class="custom-field--value">
+      {{ collection.metafields["custom_fields"]["menu_text"] }}
+
+    </div>
+  </div>
+{% endif %}

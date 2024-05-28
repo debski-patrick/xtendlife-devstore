@@ -1,0 +1,31 @@
+# we use Shopify as our ecommerce platform
+{%- comment -%}
+# Caution! Please read https://help.shopify.com/en/manual/promoting-marketing/seo/editing-robots-txt before proceeding to make changes to this file.
+{% endcomment %}
+{% for group in robots.default_groups %}
+  {{- group.user_agent -}}
+
+  {% for rule in group.rules %}
+    {{- rule -}}
+  {% endfor %}
+
+  {%- if group.user_agent.value == '*' -%}
+  	{{- 'Disallow: /pages/partner-program-2ffe902f-f906-4052-94fa-b6feb7e74ae7' }}
+	{{- 'Disallow: /pages/partner-program' }}
+	{{- 'Disallow: /partner-program' }}
+    {{- 'Disallow: /capmag' }}
+    {{- 'Disallow: /pages/capital-magazine-promotion' }}
+    {{- 'Disallow: /ivorcx8' }}
+    {{- 'Disallow: /cyber' }}
+    {{- 'Disallow: /collections/cyber-sale' }}
+    {{- 'Disallow: /collections/cardiovascular-health-drtalks' }}
+    {{- 'Disallow: /products/cx8-heart-health-3-month-bundle' }}
+    {{- 'Disallow: /products/cx8-heart-health-2-month-bundle' }}
+    {{- 'Disallow: /products/cx8-heart-health-6-month-bundle' }}
+    {{- ' '}}
+  {%- endif -%}
+
+  {%- if group.sitemap != blank -%}
+    {{ group.sitemap }}
+  {%- endif -%}
+{% endfor %}

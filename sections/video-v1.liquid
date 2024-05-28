@@ -1,0 +1,53 @@
+<style>
+    .video-hero.block-{{section.id}} {
+      background-color:{{section.settings.bgcolor}};
+    }
+    .video-hero .section {
+      padding: 40px 20px;
+    }
+    @media screen and (max-width: 1024px){
+      .video-hero.block-{{section.id}} {
+        margin: 0 1em;
+      }
+    }
+  </style>
+  <div class="video-hero block-{{section.id}}">
+    <div class="section">
+      <div class="row is-justify-center is-align-center">
+        <div class="column two-thirds video_main">
+          <div class="embed-container" style="text-align: center;"><iframe src="https://player.vimeo.com/video/{{section.settings.video_id}}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" frameborder="0"></iframe></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% schema %}
+    {
+      "name": "Video V1",
+      "settings": [
+        {
+          "type": "color",
+          "id": "bgcolor",
+          "label": "Background Color",
+          "default": "#cae9fb"
+        },
+        {
+          "type": "text",
+          "id": "video_id",
+          "label": "Video Id",
+          "default": "625077457"
+        }
+      ],
+      "presets": [
+        {
+        "category": "Video",
+        "name": "Video V1"
+        }
+      ]
+    }
+  {% endschema %}
+  
+  {% stylesheet %}
+  {% endstylesheet %}
+  
+  {% javascript %}
+  {% endjavascript %}

@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["restrict_country"] != blank %}
+  <div class="custom-field custom-field__restrict-country custom-field__type--text">
+    <h3 class="custom-field--title">Restrict Country</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["restrict_country"] }}
+
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,156 @@
+<link rel="preload" href="{{ 'account-pages.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'account-pages.css' | asset_url }}">
+<!-- /templates/customers/account.liquid -->
+  
+<div class="account-logged-in-main account-top account-page section">
+  <div class="container">
+  <section class="account-logged-in-left">
+    <div class="row-order">
+      <h2 class="account-nav-title account-nav-title--btn" data-account-nav-btn>{{ 'customer.account.details' | t }} {{ 'layout.customer.log_out' | t | customer_logout_link | replace: '<a', '<a class="small-down--hidden"'}}<span class="down_arrow_svg hide small-down--visible">{% include 'icon-right-arrow-new' %}</span></h2>
+        <nav class="account-logged-in-nav" data-account-nav>
+          <ul>
+            {% if linklists.my-account.links.size > 0 %}
+              {% for link in linklists.my-account.links %} 
+                <li class="account-nav-item">
+                  <a href="{{ link.url }}">{{ link.title }}{% if link.title contains 'Orders'%} ({% paginate customer.orders by 1000 %}{{ customer.orders.size }}{% endpaginate %}){% endif %}</a>
+                </li>
+              {% endfor %}
+            {% endif %} 
+             <li class="hide small-down--visible mobile_link_style">{{ 'layout.customer.log_out' | t | customer_logout_link }}</li>
+          </ul>
+        </nav>
+        {% include 'account-club-navigation' %}
+    </div>
+  </section>
+
+  <section class="account-logged-in-right">
+    <div class="row-order">
+      <div class="account-section">
+        <header class="account-logged-in-row heading_titles">
+          <h1>{{section.settings.title}}</h1>
+          <p>{{section.settings.message}}</p>
+          {% comment %}
+          <a href="/account/addresses?view=new" class="btn account-btn">Add a New Address</a>
+          {% endcomment %}
+        </header>
+
+        {% comment %}{% raw %}<div class="account-logged-in-row">
+        {% for address in customer.addresses %}
+        {% if address == customer.default_address %}
+        <h2>Default Address<span class="underline"></span></h2>
+        <div class="account-column-wrapper">
+          <div class="account-row-column">
+            {{ address | format_address }}
+            {% if address.phone != "" %}
+            <p>{{ address.phone }}</p>
+            {% endif %}
+            <br>
+            {% include 'edit-address-buttons' %}
+            {% include 'edit-address-form' %}
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endraw %}
+        </div>
+        {% endcomment %}
+        <div class="account-logged-in-row">
+          <h2>{{section.settings.title_2}}<span class="underline"></span></h2>
+          <div class="account-column-wrapper">
+            <div class="account-row-column"> 
+              <div class="lable_text">
+                <h3 class="lable_title">Name</h3> <span class="text_lable">{{ customer.name }}</span>  
+              </div>
+              <div class="lable_text">
+              {% for customer_address in customer.addresses %}
+                  {% if customer_address == customer.default_address %}
+                    {% if customer_address.phone != blank %}
+                    	<h3 class="lable_title">Phone Number</h3> <span class="text_lable">{{customer_address.phone}}</span>
+                    {% endif %}                
+                  {% endif %}
+              {% endfor %}
+              </div>                           
+            </div>
+            <div class="account-row-column"> 
+              <div class="lable_text">
+              <h3 class="lable_title">Email Address</h3>  <span class="text_lable">{{ customer.email }}<br></span>           
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="account-logged-in-row">
+          <h2>{{section.settings.title_1}}<span class="underline"></span></h2>
+          <div class="account-column-wrapper address_box">
+            {% for address in customer.addresses %}
+            {% if address == customer.default_address %}
+            <div class="account-row-column account-row-column--address">              
+              <h3 class="address_title">Default address</h3>              
+              {{ address | format_address }}
+              {% if address.phone != "" %}
+              <p>{{ address.phone }}</p>
+              {% endif %}       
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% for address in customer.addresses %}
+            {% unless address == customer.default_address %}
+            <div class="account-row-column account-row-column--address">     
+              <h3 class="address_title">Address {{forloop.index}}</h3>                               
+              {{ address | format_address }}
+              {% if address.phone != "" %}
+              <p>{{ address.phone }}</p>
+              {% endif %}       
+            </div>
+            {% endunless %}
+            {% endfor %}
+          </div>
+          {% comment %}
+          <a href="/account">« Return to Account</a>{% endcomment %}
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+
+
+{% schema %}
+  {
+    "name": "Addresses Section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "My Details"
+      },
+      {
+        "type": "richtext",
+        "id": "message",
+        "label": "Message"
+      },
+      {
+        "type": "text",
+        "id": "title_2",
+        "label": "Information Title",
+        "default": "Personal Information"
+      },
+      {
+        "type": "text",
+        "id": "title_1",
+        "label": "Address Title",
+        "default": "Shipping Information"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,194 @@
+<link rel="preload" href="{{ 'key-points-description.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'key-points-description.css' | asset_url }}">
+<!-- Image With text ---->
+<style>
+  .section-{{section.id}} .quote_section-header h2 {
+    color:{{section.settings.color_title}}
+  }
+</style>
+<div class="section-{{section.id}}">
+{% if section.settings.header != blank %}
+<div class="quote_section-header text-center">
+  <h2>{{section.settings.header}}</h2>
+</div>
+{% endif %}
+{% for block in section.blocks %}
+  {% if block.settings.text_img != blank %}
+    {% capture image_layout %}
+    <div class="image-with-text_image" style="background: url('{{ block.settings.text_img | img_url: 'master' }}') no-repeat {{ block.settings.alignment }}/cover;">
+      <div class="rimage-wrapper" style="padding-top: {{ 1 | divided_by:  block.settings.text_img.aspect_ratio | times: 100}}%;">
+        <noscript><img src="{{ block.settings.text_img | img_url: 'master' }}"></noscript>
+      </div>
+    </div>
+    {% endcapture %}
+    <div class="image-with-text bg{{forloop.index}}{% if block.settings.bg_color != blank %} background{% endif %}">
+      <div class="row display-flex is-justify-space-between equal-columns--outside-trim">
+        {% if block.settings.layout == 'left' %}
+        <div class="five-twelfths medium-down--five-twelfths small-down--one-whole display-flex-row">
+          {{ image_layout }}
+        </div>
+        {% endif %}
+        <div class="seven-twelfths medium-down--five-twelfths small-down--one-whole display-flex-row align_item_center{% if block.settings.layout == 'left' %} white-space-right{% else %} white-space-left{% endif %}">
+          <div class="image-with-text_content">
+            <h2>{{block.settings.text_title}}</h2>
+            <p>{{block.settings.text_content}}</p>
+          </div>
+        </div>
+        {% if block.settings.layout == 'right' %}
+        <div class="five-twelfths medium-down--five-twelfths small-down--one-whole display-flex-row mobile_reverse">
+          {{ image_layout }}
+        </div>
+        {% endif %}    
+      </div>      
+    </div>
+  <style> 
+    .section-{{section.id}} .bg{{forloop.index}}.background {
+      background-color:{{block.settings.bgcolor}};
+    } 
+    .section-{{section.id}} .bg{{forloop.index}} .image-with-text_content h2 {
+      color:{{block.settings.title_color}};
+    }
+    .section-{{section.id}} .bg{{forloop.index}} .image-with-text_content p {
+      color:{{block.settings.content_color}};
+    }
+  </style>
+  {% endif %}
+{% endfor %}  
+</div>
+{% schema %}
+  {
+    "name": "Key Points Description V1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "header",
+        "label": "Header",
+        "default": "Foundational Health"
+      },
+      {
+        "type": "color",
+        "id": "color_title",
+        "label": "Title Color",
+        "default": "#4271a9"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image with text",
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "bg_color",
+            "label": "Set Background Color"
+          },
+          {
+            "type": "color",
+            "id": "bgcolor",
+            "label": "Background Color",
+            "default": "#cae9fb"
+          },
+          {
+            "type": "image_picker",
+            "id": "text_img",
+            "label": "Image"
+          },
+          {
+            "type": "select",
+            "id": "layout",
+            "label": "Image alignment",
+            "default": "left",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ]
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Image position",
+            "default": "center center",
+            "options": [
+              {
+                "label": "Top left",
+                "value": "left top"
+              },
+              {
+                "label": "Top center",
+                "value": "center top"
+              },
+              {
+                "label": "Top right",
+                "value": "right top"
+              },
+              {
+                "label": "Middle left",
+                "value": "left center"
+              },
+              {
+                "label": "Middle center",
+                "value": "center center"
+              },
+              {
+                "label": "Middle right",
+                "value": "right center"
+              },
+              {
+                "label": "Bottom left",
+                "value": "left bottom"
+              },
+              {
+                "label": "Bottom center",
+                "value": "center bottom"
+              },
+              {
+                "label": "Bottom right",
+                "value": "right bottom"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "text_title",
+            "label": "Title"
+          },
+          {
+            "type": "color",
+            "id": "title_color",
+            "label": "Title Color",
+            "default": "#4271a9"
+          },
+          {
+            "type": "textarea",
+            "id": "text_content",
+            "label": "Content"
+          },
+          {
+            "type": "color",
+            "id": "content_color",
+            "label": "Content Color",
+            "default": "#4271a9"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "category": "Image with Text",
+      "name": "Key Points Description V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

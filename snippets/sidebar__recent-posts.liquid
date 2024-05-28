@@ -1,0 +1,79 @@
+{%- assign article_categories = '' -%}
+{%- assign article_category_parents = '' -%}
+
+{%- for link in linklists['blog-categories'].links -%}
+  {%- assign article_category_parents = article_category_parents | append: link.title | append: '||' -%}
+  {%- assign article_categories = article_categories | append: link.title | append: '||' -%}
+  
+  {%- for child_link in link.links -%}
+    {%- assign article_categories = article_categories | append: child_link.title | append: '||' -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{%- assign article_categories = article_categories | split: '||' -%}
+{%- assign article_category_parents = article_category_parents | split: '||' -%}
+
+{% if block.settings.title != blank %}
+  <div data-has-toggle-option>
+    <h3 class="sidebar-block__heading" {% if settings.toggle_sidebar %}data-sidebar-block__toggle="closed" aria-label="toggle"{% endif %}>
+      {{ block.settings.title }}
+      {% if settings.toggle_sidebar %}
+        <button class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+          {% if settings.toggle_icon_style == 'plus_and_minus' %}
+            {%
+              render 'icon',
+              name: 'plus',
+              icon_class: 'icon--active'
+            %}
+            {%
+              render 'icon',
+              name: 'minus'
+            %}
+          {% else %}
+            {%
+              render 'icon',
+              name: 'down-caret',
+              icon_class: 'icon--active'
+            %}
+          {% endif %}
+        </button>
+      {% endif %}
+    </h3>
+  </div>
+{% endif %}
+<div class="sidebar-block__content"  {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+  {% for article_new in blogs[blog_handle].articles limit: block.settings.blog_post_count %}
+    {%- if article_new.handle != article.handle -%}
+    <div class="sidebar-block__recent-post">
+      <a href="{{ article_new.url }}" title="{{ article_new.title | escape }}">
+        <span class="article-line-item__image-wrapper">
+          <img class="article-line-item__image lazyload" src="{{ article_new | img_url: '100x100', crop: 'center' }}" srcset="{{ article_new | img_url: '100x100', crop: 'center', scale: 2 }} 2x">
+        </span>
+        <span class="article-line-item__content-wrapper">
+          {%- if article_categories != blank -%}
+            <span class="article-item__label-wrapper">
+              {%- assign article_category_output = '' -%}
+              {%- for tag in article_new.tags -%}
+                {%- assign article_categories_downcase = article_categories | downcase -%}
+                {%- assign tag_downcase = tag | downcase -%}
+                {%- if article_categories contains tag or article_categories_downcase contains tag_downcase -%}
+                  {%- capture article_category_output -%}
+                    <span class="article-item__label">
+                      {{ tag }}
+                    </span>
+                  {%- endcapture -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if article_category_output != blank -%}
+                {{ article_category_output }}
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+          <span class="article-line-item__title-link">{{ article_new.title }}</span>
+          <span class="article-line-item__publishing">{{ article_new.published_at | date: '%B %Y' }}</span>
+        </span>
+    </a>
+    </div>
+  {% endif %}
+  {% endfor %}
+</div>

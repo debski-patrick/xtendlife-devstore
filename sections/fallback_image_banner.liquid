@@ -1,0 +1,264 @@
+{% comment %}
+** Fallback Image Banner **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign heading_alignment = section.settings.heading_alignment %}
+{% assign vertical_spacing = section.settings.vertical_spacing %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% assign animation = section.settings.animation | default: 'none' %}
+{% assign banner_height = section.settings.banner_height %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- endif %}
+  }
+
+  {% render 'css-loop',
+          css: section_css,
+          id: id
+  %}
+  {% render 'css-loop',
+          css: custom_css,
+          id: id
+  %}
+{% endstyle %}
+
+{% assign image = section.settings.image %}
+{% assign subtitle = section.settings.subtitle %}
+
+{% if template.name == 'article' %}
+  {%- assign article_categories = '' -%}
+{%- assign article_category_parents = '' -%}
+
+{%- for link in linklists['blog-categories'].links -%}
+  {%- assign article_category_parents = article_category_parents | append: link.title | append: '||' -%}
+  {%- assign article_categories = article_categories | append: link.title | append: '||' -%}
+  
+  {%- for child_link in link.links -%}
+    {%- assign article_categories = article_categories | append: child_link.title | append: '||' -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{%- assign article_categories = article_categories | split: '||' -%}
+{%- assign article_category_parents = article_category_parents | split: '||' -%}
+
+  {%- assign article_parent_category_handle = '' -%}
+  {%- assign article_category_handle = '' -%}
+
+{%- capture article_category_output %}
+  {%- if article_categories != blank -%}
+    {%- assign article_categories_string = article_categories | join: '||' | prepend: '||' | append: '||' -%}
+    {%- assign article_category_parents_string = article_category_parents | join: '||' | prepend: '||' | append: '||' -%}
+    {%- assign article_categories_downcase = article_categories_string | downcase -%}
+    {%- assign article_category_parents_downcase = article_category_parents_string | downcase -%}
+
+    {%- for tag in article.tags -%}
+      {%- assign tag_test = tag | downcase | prepend: '||' | append: '||' -%}
+
+      {%- if article_category_parents_downcase contains tag_test -%}
+        {%- assign article_parent_tag = tag -%}
+      {%- endif -%}
+
+      {%- if article_categories_downcase contains tag_test -%}
+        {%- if article_parent_category_handle == blank or article_category_handle == blank -%}
+          {%- assign article_parent_category_handle = tag | handle -%}
+        {%- endif -%}
+        {%- assign article_category_handle = tag | handle -%}
+        {% comment %}
+        <div class="post-header__category">
+          {% capture topic_link %}{{ blog.url }}/tagged/{{ tag | handle }}{% endcapture %}
+          <a class="post-header__category-link" href="{{ topic_link }}">
+            {{ tag }}
+          </a>
+        </div>
+        {% endcomment %}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if article_parent_tag != blank -%}
+      {%- assign article_parent_category_handle = article_parent_tag | handle -%}
+    {%- endif -%}
+  {%- endif -%}
+{% endcapture -%}
+  
+  {% assign title = article.title %}
+  {% assign asset_image = false %}
+  {%- if article.image.width == blank or article.image.width < 600 -%}
+      {% assign asset_image = true %}
+      {%- if article_parent_category_handle != blank -%}
+          {%- assign image = 'blog-header-' | append: article_parent_category_handle | append: '.jpg' -%}
+        {%- else -%}
+          {% assign image = 'blog-header-default.jpg' %}
+      {% endif %}  
+    {% else %}
+      {% assign image = article.image %}
+  {%- endif -%}  
+{% elsif template.name == 'collection' %}
+  {% assign title = collection.title %}
+  {%- if collection.image -%}
+    {% assign image = collection.image %}
+  {%- elsif section.settings.image -%}
+    {% assign image = section.settings.image %}
+  {%- else %}
+    {% assign image = collection.products.first.featured_image %}
+  {% endif %}
+  {% elsif template.name == 'page' %}
+  {% assign title = page.title %}
+{% endif %}
+
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}">
+  <div class="container
+              {% if width == 'wide' %}
+                equal-columns--outside-trim
+              {% endif %}">
+    <div class="banner__wrapper
+                one-whole
+                column
+                dark-overlay-{{ section.settings.image_darken }}
+                is-{{ banner_height }}">
+      {% if asset_image %}
+        {% render 'asset-image-element',
+                  image: image,
+                  alt: image.alt,
+                  stretch_width: true
+          %}
+      {% else %}  
+        {% if image != blank %}
+          {% render 'image-element',
+                  image: image,
+                  alt: image.alt,
+                  stretch_width: true
+          %}
+        {% else %}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      {% endif %}
+      {% unless template.name == 'article' %}
+      <div class="banner__content card-content medium-down--hidden">
+        <div class="banner__text">
+          {% if title != blank %}
+          <h1 class="banner__heading title">{{ title }}</h1>
+          {% endif %}  
+          {% if subtitle != blank %}
+            <p class="banner__subheading subtitle">{{ subtitle }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endunless %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+
+{
+  "name": "Banner",
+  "class": "banner overlaid-header-option",
+  "templates": [
+    "collection",
+    "article",
+    "page"
+  ],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback image",
+      "info": "The featured image will be used by default. This image will only be shown if there is no featured image set. 1800 x 800px recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_darken",
+      "label": "Darken banner image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced",
+      "info": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

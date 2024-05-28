@@ -1,0 +1,138 @@
+{% if collection.handle != blank and collection.products_count > 0 %}
+  <div class="collection-items-wrapper">
+
+    <!-- collection-tag-filter -->
+    {% if section.settings.collection_filter != blank and  section.settings.collection_tags %}
+    {% assign collection_filter = section.settings.collection_filter |strip_html|split:',' %}
+
+    <div class="clearfix filter">
+      <label class="filter-text_new">Filter By</label>
+      <select class="coll-filter">
+        <option value="">All Products</option>
+        {{current_tags}}
+        {% for tag in collection_filter %}
+            {% assign downcasetag = tag | downcase %}   	
+            {% assign words = downcasetag | split: '-' %}
+
+            {% assign tagfilter_option_text = '' %}
+            {% for word in words %}
+                {% assign word_cap = word | capitalize | append: ' ' %}
+                {% assign tagfilter_option_text = tagfilter_option_text | append: word_cap %} 
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Womens", "Women's" %} 
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Mens", "Men's" %}
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Childrens", "Children's" %}
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Bone Joints", "Bone & Joint Health" %}
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Brain Memory Support", "Brain & Memory Support" %}
+                {% assign tagfilter_option_text = tagfilter_option_text | replace: "Blood Sugar Metabolic Support", "Blood Sugar & Metabolic Support" %}
+            {% endfor %}
+            {% assign tagfilter_option_text = tagfilter_option_text | strip %}
+
+
+            {% if collection.all_tags contains tag %} 
+                {% if current_tags contains tag %}
+                    <option value="{{ tag | handle }}" selected>{{ tagfilter_option_text }}</option>
+                {% elsif current_tags contains "digestive health" and tag == "digestive-health" %}
+                    <option value="{{ tag | handle }}" selected>{{ tagfilter_option_text }}</option>
+                {% elsif current_tags contains "womens skincare" and tag == "womens-skincare" %}
+                    <option value="{{ tag | handle }}" selected>{{ tagfilter_option_text }}</option>
+                {% elsif current_tags contains "mens skincare" and tag == "mens-skincare" %}
+                    <option value="{{ tag | handle }}" selected>{{ tagfilter_option_text }}</option>
+                {% else %}
+                    <option value="{{ tag | handle }}"  >{{ tagfilter_option_text }}</option>
+                {% endif %} 
+            {% endif %}
+        {% endfor %}
+
+      </select>
+    </div>
+
+    <script>
+      /* Product Tag Filters - Good for any number of filters on any type of collection pages */
+      const collFilters = document.querySelectorAll('.coll-filter');
+
+      if (collFilters.length > 0) {
+        collFilters.forEach((collFilter) => {
+          collFilter.addEventListener('change', function(){
+            var newTags = [];
+            collFilters.forEach((collFilter) => {
+              for(var i = 0; i <= collFilter.length-1; i++){
+                if(collFilter[i].selected == true && collFilter[i].value != "") {
+                  newTags.push(collFilter[i].value);
+                }
+              }
+            });
+
+            if (newTags.length) {
+              var query = newTags.join('+');
+              window.location.href = '/collections/{{ collection.handle }}/' + query;
+            }
+            else {
+              {% if collection.handle %}
+              window.location.href = '/collections/{{ collection.handle }}#all';
+              {% elsif collection.products.first.type == collection.title %}
+              window.location.href = '{{ collection.title | url_for_type }}';
+              {% elsif collection.products.first.vendor == collection.title %}
+              window.location.href = '{{ collection.title | url_for_vendor }}';
+              {% endif %}
+            }
+          });
+        });
+      }
+
+
+      {% if current_tags %}
+      window.location.href = "#filter";
+      {% elsif collection.sort_by !="" %}
+      window.location.href = "#filter";
+      {%else%}
+        if (window.location.hash == '#all') {
+          window.location.href = "#filter";
+          $('html').css('scroll-padding-top','77px');
+            }
+      {%endif%}
+
+    </script>
+
+    {% endif %}
+
+    <style>
+        {% if current_tags %}
+      html {
+      scroll-padding-top: 77px; /* height of sticky header */
+    }
+      {% elsif collection.sort_by !="" %}
+    html {
+      scroll-padding-top: 77px; /* height of sticky header */
+    }
+
+      {%endif%}
+    </style>
+    <div class="collection__sort-by-filter select">
+      <select class="sort_by" id="sort-by" data-default-sort="{{ collection.sort_by | default: collection.default_sort_by  }}">
+        <option value="manual">Sort by</option>
+        <option value="manual">{{ 'collections.sorting.featured' | t }}</option>
+        <option value="best-selling">{{ 'collections.sorting.best_selling' | t }}</option>
+        <option value="title-ascending">{{ 'collections.sorting.az' | t }}</option>
+        <option value="title-descending">{{ 'collections.sorting.za' | t }}</option>
+        <option value="price-ascending">{{ 'collections.sorting.price_ascending' | t }}</option>
+        <option value="price-descending">{{ 'collections.sorting.price_descending' | t }}</option>
+        <option value="created-descending">{{ 'collections.sorting.date_descending' | t }}</option>
+        <option value="created-ascending">{{ 'collections.sorting.date_ascending' | t }}</option>
+      </select>
+    </div>
+    
+    
+    {% if section.settings.product_count  %}  
+      <div class="clearfix filter">
+        <label class="filter-text_new">Choose From</label>
+        <select onchange="location = this.value;" class="coll-filter count_product">
+          <option value=""><span class="product-count">{{ collection.products_count }}</span> Products</option>
+   		 {% for item in products %}
+          <option value="{{ item.url }}">{{ item.title }}</option>
+          {% endfor %}
+        </select>  
+      </div>
+      {% endif %}
+
+  </div>
+{% endif %}

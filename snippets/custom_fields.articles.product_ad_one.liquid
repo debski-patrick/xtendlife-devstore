@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["product_ad_one"] != blank %}
+  <div class="custom-field custom-field__product-ad-one custom-field__type--product-reference">
+    <h3 class="custom-field--title">Product Ad One</h3>
+    <div class="custom-field--value">  
+    {% assign product_ref = all_products[article.metafields["custom_fields"]["product_ad_one"]] %}
+    {{ product_ref.title | link_to: product_ref.url }}
+    </div>
+  </div>
+{% endif %}

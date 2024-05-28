@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["health_topics"] != blank %}
+  <div class="custom-field custom-field__health-topics custom-field__type--page-reference">
+    <h3 class="custom-field--title">Health Topics</h3>
+    <div class="custom-field--value">  
+      {% assign page_ref = pages[collection.metafields["custom_fields"]["health_topics"]] %}
+      {{ page_ref.title | link_to: page_ref.url }}
+    </div>
+  </div>
+{% endif %}

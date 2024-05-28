@@ -1,0 +1,134 @@
+<style>
+    .custom-product {
+      background: #f9c9d9;
+      padding: 50px 0;
+    }
+    .custom-product h2{
+      color: #b81f58;
+    }
+    .custom-product .description, 
+    .custom-product .price{
+      margin-bottom: 16px;
+    }
+    .custom-product .product-price-compare {
+        font-weight: 700;
+        font-style: italic;
+        text-decoration: line-through;
+        display: section;
+        color: #6f757c;
+        opacity: .6;
+        font-size: 1em;
+        margin: 0 0 .5em;
+    }
+    .custom-product .product-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    .custom-product .add-to-cart {
+        margin-bottom: 16px;
+    }
+    .custom-product .new_add_tocart_cr{
+      width: auto;
+      padding: 0px 50px;
+    }
+    @media (min-width: 768px){
+      .custom-product .right-column {
+        padding-left: 4%;
+      }
+    }
+  </style>
+  <div class="custom-product">
+    <div class="section">
+      <div class="row content is-justify-space-between equal-columns--outside-trim">
+        <div class="medium-down--one-whole one-half left-column">
+          <img src="{{ section.settings.image | img_url: 'master' }}">
+        </div>
+        <div class="medium-down--one-whole one-half right-column">
+          <h2>{{ section.settings.title }}</h2>
+          <div class="description">
+            {{ section.settings.description }}
+          </div>
+          <div class="price">
+            {% if section.settings.compare-price != blank %}
+            <div class="product-price-compare">
+              {{ section.settings.compare-price }}
+            </div>
+            {% endif %}  
+            {% if section.settings.price != blank %}
+            <div class="product-price">
+              {{ section.settings.price }}
+            </div>    
+            {% endif %}  
+          </div>
+          <div class="add-to-cart">
+            {% assign item = section.settings.product-1 %}
+            {% assign item1 = section.settings.product-2 %}
+            <a class="button button--add-to-cart" href="/cart/{{ item.selected_or_first_available_variant.id }}:1,{{ item1.selected_or_first_available_variant.id }}:1?discount=ZUPAXL">{{ 'products.product.add_to_cart' | t }}</a>
+          </div>
+          <div class="t-and-c">
+            {{ section.settings.t-and-c }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% schema %}
+    {
+      "name": "Custom Product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price"
+        },
+        {
+          "type": "text",
+          "id": "compare-price",
+          "label": "Compare at price"
+        },
+        {
+          "type": "product",
+          "id": "product-1",
+          "label": "Select Product"
+        },
+        {
+          "type": "product",
+          "id": "product-2",
+          "label": "Select Product"
+        },
+        {
+          "type": "textarea",
+          "id": "t-and-c",
+          "label": "T&C"
+        }
+      ],
+      "presets": [
+        {
+        "category": "Product",
+        "name": "Custom Product V1"
+        }
+      ]
+    }
+  {% endschema %}
+  
+  {% stylesheet %}
+  {% endstylesheet %}
+  
+  {% javascript %}
+  {% endjavascript %}

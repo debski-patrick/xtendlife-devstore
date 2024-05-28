@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["brand_strapline"] != blank %}
+  <div class="custom-field custom-field__brand-strapline custom-field__type--single-line-text-field">
+    <h3 class="custom-field--title">Brand Strapline</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["brand_strapline"] }}
+
+    </div>
+  </div>
+{% endif %}

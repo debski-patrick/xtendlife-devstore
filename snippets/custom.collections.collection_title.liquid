@@ -1,0 +1,9 @@
+{% if collection.metafields["custom"]["collection_title"] != blank %}
+  <div class="custom-field custom-field__collection-title custom-field__type--single-line-text-field">
+    <h3 class="custom-field--title">Collection Title</h3>
+    <div class="custom-field--value">
+      {{ collection.metafields["custom"]["collection_title"] }}
+
+    </div>
+  </div>
+{% endif %}

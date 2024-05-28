@@ -1,0 +1,358 @@
+<link rel="preload" href="{{ 'account-pages.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'account-pages.css' | asset_url }}">
+{% comment %}
+** Account details template - main content area **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+
+  {% render 'css-loop',
+          css: section_css,
+          id: id
+  %}
+  {% render 'css-loop',
+          css: custom_css,
+          id: id
+  %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section section__wrapper1 account-top is-width-{{ width }} {{ css_class }}">
+  {% comment %}
+  <header class="container">
+    {%- capture title -%}{{ 'customer.account.details' | t }}{%- endcapture -%}
+    {% render 'heading',
+            title: title,
+            heading_tag: 'h1',
+            context: 'account-details',
+            text_alignment: 'left'
+    %}
+  </header>
+  {% endcomment %}
+
+  <div class="container">
+        <aside class="account-logged-in-left">
+      <div class="row-order">
+        {% include 'account-sidebar' %}
+      </div>
+    </aside>
+    <main class="account-main account-logged-in-right">
+      <div class="row-order">
+        <div class="account-section">    
+          <header class="account-logged-in-row">
+            <h1 class="customer_name_order">Hi, {{ customer.name }}!</h1>
+            <p>{{section.settings.message}}</p>        
+          </header>
+          <club-management id="body">    
+            <div class="account-logged-in-row vip_member_section">
+            <div class="account-logged-in-row">
+            	<div class="account-column-wrapper">
+            		<div class="account-row-column" style="background-color: #dee6f3;">
+                    <div class="info_section">
+                    	<div class="skeleton-h1 skeleton-text" style="margin-top:0"></div>
+                    	<div class="skeleton-title skeleton-text"></div>
+                      <div class="skeleton-title skeleton-text"></div>
+                      <div class="skeleton-title skeleton-text"></div>
+                    </div>          			
+            		</div>
+                	<div class="account-row-column">
+                    <div class="info_section">
+                    	<div class="skeleton-h1 skeleton-text" style="margin-top:0"></div>
+                      <p>
+                      	<div class="skeleton-title skeleton-p-full"></div>
+                      	<div class="skeleton-title skeleton-p-half"></div>
+                      </p>                  	
+                      <p>
+                      	<div class="skeleton-title skeleton-p-full"></div>
+                      	<div class="skeleton-title skeleton-p-half"></div>
+                      </p>                    
+                    </div>
+            		</div>
+            	</div>
+            </div>
+          </div>
+        </club-management>
+        <!-- Order table !-->
+        {% if customer.orders.size > 0 %}
+          <div class="account-logged-in-row">
+            <h1 class="main_title_account">{{ section.settings.my_recent_orders }}</h1>
+            {% paginate customer.orders by 5 %}
+              {% include 'account-orders-table' %}
+            {% endpaginate %}
+          </div>
+        {% endif %}
+        
+        <div class="account-logged-in-row">
+        <h1 class="main_title_account">{{ section.settings.my_detail }}</h1>
+        <div class="account-column-wrapper">
+          <div class="account-row-column left">
+            <h2>{{ section.settings.personal_information }}</h2>
+              <p class="">
+               <span class="lable_account">{{ section.settings.full_name }}</span> <span class="text_lable">{{ customer.name }}<br></span>
+               <span class="lable_account">{{ section.settings.email_address }}</span> <span class="text_lable">{{ customer.email }}<br></span>                             
+                {% for customer_address in customer.addresses %}
+                {% if customer_address == customer.default_address %}
+                {% if customer_address.phone != blank %}
+                <span class="lable_account">{{ section.settings.phone_number }}</span> <span class="text_lable">{{customer_address.phone}}<br></span>
+                {% endif %}                
+                {% endif %}
+                {% endfor %}
+              </p>
+          </div>
+          <div class="account-row-column right">
+            <h2>{{ section.settings.shipping_information }}</h2>
+           <p class="">
+             {% for customer_address in customer.addresses %}
+             {% if customer_address == customer.default_address %}
+             <span class="lable_account">{{ section.settings.full_name }}</span> <span class="text_lable">{{ customer_address.first_name }} {{customer_address.last_name}}<br></span>
+             {% if customer_address.address1 != blank or customer_address.address2 != blank%}
+             <span class="lable_account">{{ section.settings.address }}</span> <span class="text_lable">{{ customer_address.address1 }}{{ customer_address.address2 }}<br></span>
+             {% endif %}
+             {% if customer_address.city != blank or customer_address.country != blank %}
+             <span class="lable_account">{{ section.settings.city_country }}</span> <span class="text_lable">{{customer_address.city}}, {{customer_address.country}}<br></span>
+             {% endif %}
+             {% if customer_address.phone != blank %}
+             <span class="lable_account">{{ section.settings.phone_number }}</span> <span class="text_lable">{{customer_address.phone}}<br></span>
+             {% endif %}              
+             {% endif %}
+             {% endfor %}
+            </p>    
+          </div>
+        </div>
+      </div>  
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<script type="text/javascript">
+  //var loadLPDashboard = "{{load_lp_dashboard}}";
+  
+  //if(loadLPDashboard === "false")
+  //{
+  //  $("club-management#body").hide();
+  //  $("club-management#menu").hide();
+  //  $(".account-nav-title--loyalty").hide();
+  //}
+  var tlp = document.createElement("script"); tlp.src = "https://{{request.host}}/apps/xtendlifeclub/script", tlp.type = 'text/javascript', tlp.crossOrigin = 'anonymous', tlp.async = !0; var elp = document.getElementsByTagName("script")[0];
+  elp.parentNode.insertBefore(tlp, elp);
+  
+  $(document).ready(function() {
+    //
+  var loadTime = 0;
+  var waitForXtendLife = setInterval(function () {
+    if (window.Account) {
+      window.xlReady(loadTime);
+      clearInterval(waitForXtendLife);
+    }
+    loadTime += 10;
+  }, 10);
+});
+
+window.xlReady = function (loadTime) {
+  console.log("xlReady in " + loadTime > 0 ? loadTime / 1000 : 0 + " seconds");
+     var accountDashboard = new Account.Dashboard("{{ customer.email }}", {{ customer.id }}, "{{shop.permanent_domain}}", "{{request.host}}", "{{order_count}}");
+    window.AccountDashboard = accountDashboard;
+}
+</script>
+{% schema %}
+  {
+    "name": "Account details",
+    "class": "account-section-page",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Page Labels"
+      },
+      {
+        "type": "text",
+        "id": "my_recent_orders",
+        "label": "My Recent Orders",
+        "default": "My Recent Orders"
+      },
+      {
+        "type": "text",
+        "id": "my_detail",
+        "label": "My Details",
+        "default": "My Details"
+      },
+      {
+        "type": "text",
+        "id": "personal_information",
+        "label": "Personal Information",
+        "default": "Personal Information"
+      },
+      {
+        "type": "text",
+        "id": "shipping_information",
+        "label": "Shipping Information",
+        "default": "Shipping Information"
+      },
+      {
+        "type": "text",
+        "id": "full_name",
+        "label": "Full Name",
+        "default": "Full Name:"
+      },
+      {
+        "type": "text",
+        "id": "email_address",
+        "label": "Email Address",
+        "default": "Email Address:"
+      },
+      {
+        "type": "text",
+        "id": "phone_number",
+        "label": "Phone Number",
+        "default": "Phone Number:"
+      },
+      {
+        "type": "text",
+        "id": "address",
+        "label": "Address",
+        "default": "Address:"
+      },
+      {
+        "type": "text",
+        "id": "city_country",
+        "label": "City/Country",
+        "default": "City/Country:"
+      },
+      {
+        "type": "header",
+        "content": "Page Details"
+      },
+      {
+        "type": "richtext",
+        "id": "message",
+        "label": "Message",
+		"default":"<p>From your dashboard you have the ability to view a snapshot of your recent account activity, update your account information and view items from your wishlist.</p>"
+      },
+	  {
+        "type": "header",
+        "content": "VIP Member"
+	  },
+	  {
+        "type": "image_picker",
+        "id": "vip_img",
+        "label": "VIP Banner Image"
+	  },
+	  {
+        "type": "text",
+        "id": "title",
+        "label": "heading",
+		"default": "Become a VIP Member"
+	  },
+	  {
+        "type": "text",
+        "id": "content_vip",
+        "label": "Information 1",
+		"default": "Save 10% off all orders"
+	  },  
+	  {
+        "type": "text",
+        "id": "content_vip_1",
+        "label": "Information 2",
+		"default": "Exclusive promotions"
+	  }, 
+	  {
+        "type": "text",
+        "id": "content_vip_2",
+        "label": "Information 3",
+		"default": "Expert health advice"
+	  },   
+      {
+        "type": "text",
+        "id": "btn_title",
+        "label": "Learn More button",
+        "default": "Learn More"      
+      },    
+      {
+        "type": "url",
+        "id": "btn_url",
+        "label": "Button Url"     
+      },    
+      {
+        "type": "text",
+        "id": "btn_title_1",
+        "label": "Join Now button",
+        "default": "Join Now"      
+      },    
+      {
+        "type": "url",
+        "id": "btn_url_1",
+        "label": "Button Url"     
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

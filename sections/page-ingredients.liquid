@@ -1,0 +1,105 @@
+<link rel="preload" href="{{ 'blog_ingredient.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'blog_ingredient.css' | asset_url }}">
+<style>
+  .back_clr .image-element__wrap img {
+	border-radius: 20px;
+}
+.ingredient-card {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+  .slideshow-classic__buttons {
+	justify-content: start;
+	margin-top: 25px;
+}
+  .slideshow-classic__buttons .button.button--primary {
+	margin-right: 10px;
+}
+  .slideshow-classic__buttons a.button.button--secondary,
+  .slideshow-classic__buttons .button.button--primary,
+  .slideshow-classic__buttons a.button.button--secondary:link,
+  .slideshow-classic__buttons .button.button--primary:link{
+	background: #fff;
+    color: #000;
+    text-transform: uppercase;
+  }
+  .slideshow-classic__buttons .button.button--primary.active,
+  .slideshow-classic__buttons a.button.button--secondary.active {
+	background: #4271a9;
+    color: #fff;
+  }
+</style>
+<div class="section page_content ingredients_content">
+  <div class="container ingredient_content">
+    <div class="ingredint__buttons">
+      <a href="#supplements_blog" class="button button--primary">Supplement</a>
+      <a href="#skincare_blog" class="button button--primary button_2">Skincare</a>
+    </div>
+    {% include 'filter', filter_letters: true, filter_for: 'ingredients' %}
+  </div>
+  <ul class="tabs-content">
+    <li class="active" id="supplements_blog">
+      <div class="max-width-container">
+	  {% if section.settings.supplement_intro != blank %}
+        <section class="text__layout ingredient__container">
+          {{ section.settings.supplement_intro }}
+        </section>
+        {% endif %}
+        {% assign blog = blogs[section.settings.blog_category]%}
+        {% paginate blog.articles by 500 %}
+        {% include 'ingredient-cards' %}
+        {% endpaginate %}
+      </div>
+    </li>
+    <li id="skincare_blog">
+      <div class="max-width-container">
+        {% if section.settings.skincare_intro != blank %}
+        <section class="text__layout ingredient__container">
+          {{ section.settings.skincare_intro }}
+        </section>
+        {% endif %}
+        {% assign blog1 = blogs[section.settings.blog_category_1]%}
+        {% assign blog = blog1 %}
+        {% paginate blog.articles by 500 %}
+        {% include 'ingredient-cards'%}
+        {% endpaginate %}
+      </div>
+    </li>
+  </ul>
+</div>
+
+{% schema %}
+  {
+    "name": "Ingredients Page",
+    "settings": [
+      {
+      "type": "html",
+      "id": "supplement_intro",
+      "label": "Introduction Text",
+	  "default": "<p>At Xtend-Life, we ensure that only the best goes into our quality supplements. No expense is spared in the sourcing of raw ingredients, and each is carefully selected for purity, potency and bio-availability. We then optimize these ingredients by blending them with complimentary ingredients to ensure optimal synergy within the formulations.<\/p><p>Find out the important roles each ingredient plays in Xtend-Life formulations. Use this section to learn more about individual ingredients: their many benefits, ingredient origins and the Xtend-Life products they feature in. All ingredients are listed alphabetically, simply click on an ingredient to learn more.<\/p>"
+     },
+	 {
+      "type": "blog",
+      "id": "blog_category",
+      "label": "Choose blog category"
+     },
+     {
+      "type": "html",
+      "id": "skincare_intro",
+      "label": "Introduction Text",
+	  "default": "<p>At Xtend-Life, we ensure that only the best goes into our quality skincare. No expense is spared in the sourcing of raw ingredients, and each is carefully selected for maximum skin benefits while keeping in line with our skincare philosophy. We then optimize these ingredients by blending them with complimentary ingredients to ensure optimal synergy within the formulations.<\/p><p>Find out the important roles each ingredient plays in Xtend-Life formulations. Use this section to learn more about individual ingredients: their many benefits, ingredient origins and the Xtend-Life products they feature in. All ingredients are listed alphabetically, simply click on an ingredient to learn more.<\/p>"
+     },
+	 {
+      "type": "blog",
+      "id": "blog_category_1",
+      "label": "Choose blog category"
+     }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

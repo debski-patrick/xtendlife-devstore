@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["collection_title_color"] != blank %}
+  <div class="custom-field custom-field__collection-title-color custom-field__type--text">
+    <h3 class="custom-field--title">Collection Title color</h3>
+    <div class="custom-field--value">
+      {{ collection.metafields["custom_fields"]["collection_title_color"] }}
+
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,161 @@
+<style>      
+  .alert {
+      position: relative;
+      padding: .75rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+      border-radius: .25rem;
+  }
+  .alert p{
+      margin: 0 0 1rem 0;
+  }
+  .alert ul{
+    list-style-type: disc;
+    list-style-position: outside;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+  }
+  .alert strong{
+    font-weight: 700;
+  }
+  .alert-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+  }
+  .alert-info {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+  }
+  .alert-orange{
+    background-color: #ee8e28;
+    color: #fff;
+    border-color: #BB690F;
+  }
+  .alert-orange a{
+      color:#fff;
+      text-decoration:underline;
+  }
+    /* Contry redirect popup */
+    @media (max-width: 767px){
+    .country_poup, .shipping_poup, .korea_poup {
+      width: 90% !important;
+    }
+  }
+  @media (max-width: 600px){
+    .country_poup  ul{
+      margin-bottom: 15px;
+    }
+    .country_poup header, .country_poup .content, .shipping_poup header, .shipping_poup .content, .korea_poup header, .korea_poup content{
+      padding: 20px !important;
+    }
+    .country_poup .content p, .shipping_poup .content p, .korea_poup .content p {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    .country_poup .country_cls{
+      margin-top: 15px;
+    }
+  }
+  .country_poup, .shipping_poup, .korea_poup {
+    width: 520px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    box-shadow: 2px 2px 8px 2px #888;
+    z-index: 9999;
+  }
+  .country_poup header, .shipping_poup header, .korea_poup header{
+    padding: 20px 30px;
+  }
+  .country_poup header h2, .shipping_poup header h2, .korea_poup header h2{
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  .country_poup header svg {
+    left: unset;
+    right: 15px;
+    top: 31px;
+  }
+  .country_cls, .shipping_cls, .korea_cls {
+    display: block;
+    text-align: right;
+    margin-top: 40px;
+  }
+  .country_cls a, .shipping_cls a,  .korea_cls a{
+    padding: 15px 40px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 1.375em 3em;
+    border: 1px solid #36659c;
+    border-radius: 4px;
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #36659c;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    outline: 0 none;
+  }
+  .country_cls a:hover, .shipping_cls a:hover, .korea_cls a:hover  {
+    background-color: #3f73af;
+    border-color: #3f73af;
+    color: #fff;
+}
+  .field.find_country {
+    font-size: 15px;
+  }
+  .country_poup  .content, .shipping_poup  .content, .korea_poup  .content{
+    padding: 30px;
+  }
+  .content p {
+    color: #000;
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+    font-family: "Open Sans", Arial, sans-serif;
+  }
+  .country_poup  ul{
+    margin-bottom: 20px;
+  }
+  .country_poup  ul li a {
+    font-size: 0.875rem;
+    font-family: "Open Sans", Arial, sans-serif;
+    text-decoration: underline;
+    padding-bottom: 8px;
+    display: inline-block;
+    color: #7eabe0;
+  }
+  .shipping_poup .content p a{        
+    text-decoration: underline;
+    color: #7eabe0;
+  }
+  .field.find_country svg {
+    position: unset;
+    display: inline-block;
+    transform: unset;
+    padding-left: 10px;
+  }
+  .overlay {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+</style>

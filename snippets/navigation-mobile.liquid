@@ -1,0 +1,54 @@
+{% if children.links.size > 0 %}
+  <li class="mobile-menu__item">
+    <!-- <a class="mobile-menu__item-link mobile-menu__item-link--has-child js-mobile-child" href="{{ parent_url }}"><div class="mobile-menu__item-link-text">{{ parent_title }}</div></a> -->
+    <ul class="mobile-menu mobile-menu--child js-mobile-child-menu" style="display: block;position: unset;transform: unset; padding:0;">
+      <!-- <li class="mobile-menu__item mobile-menu__item--heading">
+        <button class="mobile-menu__back btn-text-link js-mobile-back" type="button">Back</button>
+        <span class="mobile-menu__item-title">{{ parent_title }}</span>
+      </li> -->
+      {% for level_1_link in children.links %}
+
+        {% if level_1_link.links.size > 0 %}
+          <li class="mobile-menu__item">
+            <a class="mobile-menu__item-link mobile-menu__item-link--has-child js-mobile-child" href="{{ level_1_link.url }}"><div class="mobile-menu__item-link-text">{{ level_1_link.title }}</div></a>
+            <ul class="mobile-menu mobile-menu--child js-mobile-child-menu">
+              <li class="mobile-menu__item mobile-menu__item--heading">
+                <button class="mobile-menu__back btn-text-link js-mobile-back" type="button">Back</button>
+                <span class="mobile-menu__item-title">{{ level_1_link.title }}</span>
+              </li>
+              {% for level_2_link in level_1_link.links %}
+
+                {% if level_2_link.links.size > 0 %}
+                  <li class="mobile-menu__item">
+                    <a class="mobile-menu__item-link mobile-menu__item-link--has-child js-mobile-child" href="{{ level_2_link.url }}">
+                      <div class="mobile-menu__item-link-text">{{ level_2_link.title }}</div>
+                      {% if level_2_link.type == 'collection_link' or level_2_link.type == 'page_link' %}
+                        {% if level_2_link.object.metafields.custom_fields.menu_text != blank %}
+                          <div class="mobile-menu__item-link-subtext">{{ level_2_link.object.metafields.custom_fields.menu_text }}</div>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                    <ul class="mobile-menu mobile-menu--child js-mobile-child-menu">
+                      <li class="mobile-menu__item mobile-menu__item--heading">
+                        <button class="mobile-menu__back btn-text-link js-mobile-back" type="button">Back</button>
+                        <span class="mobile-menu__item-title">{{ level_2_link.title }}</span>
+                      </li>
+                      {% for level_3_link in level_2_link.links %}
+                        <li class="mobile-menu__item"><a class="mobile-menu__item-link mobile-menu__item-link--alt" href="{{ level_3_link.url }}">{{ level_3_link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                {% else %}
+                  <li class="mobile-menu__item"><a class="mobile-menu__item-link" href="{{ level_2_link.url }}">{{ level_2_link.title }}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
+        {% else %}
+          <li class="mobile-menu__item"><a class="mobile-menu__item-link" href="{{ level_1_link.url }}">{{ level_1_link.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+{% else %}
+  <li class="mobile-menu__item"><a class="mobile-menu__item-link" href="{{ parent_url }}">{{ parent_title }}</a></li>
+{% endif %}

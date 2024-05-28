@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["product_summary_2"] != blank %}
+  <div class="custom-field custom-field__product-summary-2 custom-field__type--multi-line-text-field">
+    <h3 class="custom-field--title">Product Summary 2</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["product_summary_2"] }}
+
+    </div>
+  </div>
+{% endif %}

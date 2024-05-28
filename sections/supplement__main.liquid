@@ -1,0 +1,63 @@
+<link rel="preload" href="{{ 'blog_ingredient.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'blog_ingredient.css' | asset_url }}">
+
+<div class="section max-width-container">
+  {% if section.settings.supplement_intro %}
+    <div class="text__layout ingredient__container">
+      {{ section.settings.supplement_intro }}
+    </div>
+  {% endif %}
+  {% include 'filter', filter_letters: true, filter_for: 'ingredients' %}
+  {% paginate blog.articles by 500 %}
+
+    <div class="ingredient-cards js-filterable" data-filter-name="ingredients">
+
+    {% assign articles = blog.articles | sort: 'title' %}
+    {% for article in articles %}
+  
+      {% assign first_letter = article.title | slice: 0 | upcase %}
+      {% if first_letter == '0' or first_letter == '1' or first_letter == '2' or first_letter == '3' or first_letter == '4' or first_letter == '5' or first_letter == '6' or first_letter == '7' or first_letter == '8' or first_letter == '9' %}
+        {% assign first_letter = '0-9' %}
+      {% endif %}
+      
+      <div class="ingredient-card js-ingredient-card {% unless first_letter == 'A' %}hide{% endunless %}" data-filter-letter="{{ first_letter }}" data-handle="{{ article.handle }}">
+        <div class="ingredient-card__info">
+          <figure class="ingredient-card__image">
+             {% render 'image-element',
+                              image: article.image,
+                              alt: article.image.alt,
+                              stretch_width: true
+                      %}
+  		</figure>
+          <div class="ingredient-card__details">
+            <h2 class="ingredient-card__title"><a class="ingredient-card__title--link" href="{{ article.url }}">{{ article.title }}</a></h2>
+            <p class="ingredient-card__excerpt">{{ article.excerpt | strip_html }}</p>
+            <p class="ingredient-card__link-container"><a class="button button--primary " href="{{ article.url }}">Learn More</a></p>
+          </div>
+        </div>
+        <div class="ingredient-card__products js-ingredient-products"></div>
+      </div>
+    {% endfor %}
+  
+  </div>
+
+  {% endpaginate %}
+</div>
+{% schema %}
+  {
+    "name": "Blog Supplement",
+    "settings": [
+      {
+        "type": "richtext",
+        "id": "supplement_intro",
+        "label": "Supplement Intro"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

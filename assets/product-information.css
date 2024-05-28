@@ -1,0 +1,20 @@
+.nutrients-facts {
+	padding-top: 15px;
+}
+  .nutrients-facts .row{
+    margin-bottom: 0;
+  }
+  .nutrients-facts .content {
+	margin-bottom: 30px;
+}
+  .nutrients-facts img {
+	width: 175px;
+}
+.nutrients-facts .content > div {
+	padding: 0 10px;
+}
+@media only screen and (max-width: 767px){
+  .nutrients-facts .content img {
+    margin-bottom: 20px;
+  }
+}

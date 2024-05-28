@@ -1,0 +1,85 @@
+<style>
+    .text-with-image-{{section.id}} h2{
+      color: #3f7cbf;
+      margin-top: 30px;
+    }
+    .text-with-image-{{section.id}} .flex{
+      display: flex;
+    }
+    .text-with-image-{{section.id}} .flex-content p{
+      margin-bottom: 15px;
+    }
+    .text-with-image-{{section.id}} .flex-content p:last-child{
+      margin-bottom: 0px;
+    }
+    .text-with-image-{{section.id}} .flex-image {
+      padding: 20px;
+      background: #cae9fb;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    
+    @media only screen and (min-width: 1200px){
+      .text-with-image-{{section.id}} .flex-image{
+        margin-top: -10px;
+      }
+    }
+    @media only screen and (max-width: 767px){
+      .text-with-image-{{section.id}} .flex {        
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .text-with-image-{{section.id}} .flex-image{
+        margin-top: 20px;
+        width: 160px;
+      }
+    }
+  </style>
+  <div class="text-with-image-{{section.id}}">
+    <div class="section">
+      <h2>{{ section.settings.title }}</h2>
+      <div class="flex">
+        <div class="flex-content">
+          {{ section.settings.description }}
+        </div>
+        <div class="flex-image">
+          <img src="{{ section.settings.image | img_url: 'master' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Title with Small image V1",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image",
+        "info": "200 x 270"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      }
+    ],
+    "presets": [
+      {
+      "category": "text",
+      "name": "Title with Small image V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

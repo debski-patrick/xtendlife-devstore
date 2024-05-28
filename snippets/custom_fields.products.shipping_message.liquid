@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["shipping_message"] != blank %}
+  <div class="custom-field custom-field__shipping-message custom-field__type--single-line-text-field">
+    <h3 class="custom-field--title">Shipping Message</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["shipping_message"] }}
+
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["country_restrictions"] != blank %}
+  <div class="custom-field custom-field__country-restrictions custom-field__type--json">
+    <h3 class="custom-field--title">Country Restrictions</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["country_restrictions"] }}
+
+    </div>
+  </div>
+{% endif %}

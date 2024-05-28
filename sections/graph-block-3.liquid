@@ -1,0 +1,245 @@
+<style>
+    .box-{{section.id}} .box-container {
+      margin-top: 30px;
+      margin-bottom: 0;
+    }
+    .box-{{section.id}} .box-flex {
+      color: #fff;
+      margin-bottom: 30px;
+    }    
+    .box-{{section.id}} .box-flex a{
+      color: #fff;
+    }
+    .box-{{section.id}} .box-bg {
+      padding: 15px 20px;
+      border-radius: 30px;
+    }
+    .box-{{section.id}} .box-content {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      width: 100%;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      -moz-align-items: center;
+      -ms-align-items: center;
+      -o-align-items: center;
+      align-items: center;
+    }
+    .box-{{section.id}} p.box-title{
+      font-size: 25px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 5px;
+      font-family: Montserrat,sans-serif;
+    }
+    .box-{{section.id}} .box-desc p{
+      margin-bottom: 15px;
+    }
+    .box-{{section.id}} .box-desc p:last-child{      
+      margin-bottom: 0px;
+    }
+    .box-{{section.id}} .box-graph {
+      position: relative;
+    }
+    .box-{{section.id}} .graph-title{
+      font-size: 25px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-family: Montserrat,sans-serif;
+    }
+    .box-{{section.id}} .graph-dec {
+      position: absolute;
+      right: 0;
+      top: 60px;
+      max-width: 250px;
+      width: 45%;
+    }
+    .box-{{section.id}} .graph-dec span {
+      display: block;
+      padding-left: 30px;
+      position: relative;
+    }
+    .box-{{section.id}} .graph-dec span::before {
+      content: '';
+      background-color: #fff;
+      height: 20px;
+      width: 20px;
+      position: absolute;
+      left: 0;
+      top: 2px;
+      border-radius: 21px;
+    }
+    .graph-dec span:first-child::before {
+      background-color: #fdbf1a;
+    }
+    .graph-dec span:last-child::before {
+      background-color: #3d7bbe;
+    }
+    .box-{{section.id}} .box-flex:last-child .box-bg:first-child{
+      margin-bottom: 30px;
+    }
+    
+/*     @media only screen and (min-width: 1200px){
+      .box-4c326f58-ec83-424b-8e04-125b131790a9 .box-flex:last-child .box-bg{
+        padding-bottom: 12.8vh;
+      }
+    } */
+    @media only screen and (min-width: 992px){
+      .box-{{section.id}} .box-container{
+        display: flex;
+      }
+      .box-{{section.id}} .box-flex {
+        display: flex;
+        margin-bottom: 0;
+      }
+      .box-{{section.id}} .box-flex:last-child{
+        flex-direction: column;
+      }      
+      .box-{{section.id}}  .box-bg{
+        display: flex;
+        height: 100%;
+      }
+      .box-{{section.id}} .box-flex:first-child{
+        margin-bottom: 0px;
+      }      
+    }
+    @media only screen and (max-width: 767px){
+      .box-{{section.id}} p.box-title,
+      .box-{{section.id}} .graph-title{
+        font-size: 15.5px;
+      }
+      .box-{{section.id}} .graph-dec{
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        top: auto;
+        right: auto;
+        margin-top: 10px;
+      }
+      .box-{{section.id}} .graph-dec span{
+        font-size: .875rem;
+        margin-bottom: 10px;
+      }
+      .box-{{section.id}} .graph-dec span::before {
+        height: 15px;
+        width: 15px;
+        top: 3px;
+      }
+      .box-{{section.id}} .box-desc p{
+        font-size: .875rem;
+      }
+    }
+  </style>
+  <div class="section box-{{section.id}}">
+    <div class="row is-justify-space-between equal-columns--outside-trim box-container">
+      <div class="one-half medium-down--one-whole box-flex">
+        <div class="box-bg" style="background-color: {{section.settings.color_1}};">
+          <div class="box-inner">
+            <p class="box-title">{{section.settings.title_1}}</p>
+            <div class="box-desc">{{section.settings.description_1}}</div>            
+            <div class="box-graph">
+              <p class="graph-title">{{section.settings.graph_title}}</p>
+              <p><img src="{{ section.settings.graph_image | img_url: "master"}}"></p>
+              <div class="graph-dec">{{section.settings.graph_description}}</div>
+            </div>            
+          </div>      
+        </div>      
+      </div>
+      <div class="one-half medium-down--one-whole box-flex">
+        <div class="box-bg" style="background-color: {{section.settings.color_2}};">
+          <div class="box-inner">
+            <p class="box-title">{{section.settings.title_2}}</p>
+            <div class="box-desc">{{section.settings.description_2}}</div>
+          </div>      
+        </div> 
+        <div class="box-bg" style="background-color: {{section.settings.color_3}};">
+          <div class="box-inner">
+            <p class="box-title">{{section.settings.title_3}}</p>
+            <div class="box-desc">{{section.settings.description_3}}</div>
+          </div>      
+        </div> 
+      </div>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Graph with 3 blocks V1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title_1",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description_1",
+        "label": "Description"
+      },
+      {
+        "type": "text",
+        "id": "graph_title",
+        "label": "Graph Title"
+      },
+      {
+        "type": "image_picker",
+        "id": "graph_image",
+        "label": "Graph Image"
+      },
+      {
+        "type": "textarea",
+        "id": "graph_description",
+        "label": "Graph Description"
+      },
+      {
+        "type": "color",
+        "id": "color_1",
+        "label": "Background Color"
+      },
+      {
+        "type": "text",
+        "id": "title_2",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description_2",
+        "label": "Description"
+      },
+      {
+        "type": "color",
+        "id": "color_2",
+        "label": "Background Color"
+      },
+      {
+        "type": "text",
+        "id": "title_3",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description_3",
+        "label": "Description"
+      },
+      {
+        "type": "color",
+        "id": "color_3",
+        "label": "Background Color"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Product",
+      "name": "Graph with 3 blocks V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

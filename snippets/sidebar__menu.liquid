@@ -1,0 +1,152 @@
+<style>
+  .blog__topics {
+    padding: 1.5em 0;
+  }
+  .blog__topics-title, .blog__recent-title {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin: 0 0 .5em;
+  }
+  .article-tags {
+    list-style: none;
+    margin: 0;
+    font-size: 14px;
+    line-height: 14px;
+    font-weight: 700;
+    display: block;
+  }
+  .article-tags__item {
+    margin: 0 0 .25em;
+  }
+  .article-tags__link {
+    height: auto;
+    display: block;
+    border-radius: 30px;
+    white-space: nowrap;
+    text-transform: capitalize;
+    padding: .5em 0;
+    text-decoration: none;
+    font-weight: 400;
+    color: inherit;
+    width: auto;
+    left: 0;
+    right: 0;
+  }
+  .blog__topics-item > .blog__topics-link {
+    font-size: 18px;
+  }
+  .blog__topics-list ul {
+    list-style: none;
+    margin: .25em 0 .75em;
+    padding: 0 0 .5em;
+    border-bottom: 1px solid #eee;
+  }
+  .article-tags__link {
+    height: auto;
+    display: block;
+    border-radius: 30px;
+    white-space: nowrap;
+    text-transform: capitalize;
+    padding: .5em 0;
+    text-decoration: none;
+    font-weight: 400;
+    color: inherit;
+    width: auto;
+    left: 0;
+    right: 0;
+  }
+  @media only screen and (min-width: 991px){
+    .blog__topics {
+      display: block;
+      border-top: 1px solid #bfbfbf;
+      border-bottom: 1px solid #bfbfbf;
+      width: 100%;
+    }
+    
+  }
+  </style>
+{% if menu != blank %}
+  <section class="blog__topics max-width-container">
+    <h2 class="blog__topics-title">{{ linklists[menu].title | remove: '* ' }}</h2>
+    <ul class="blog__topics-list article-tags">
+      {% for link in linklists[menu].links %}
+        <li class="blog__topics-item article-tags__item">
+          <a class="blog__topics-link {% if link.links.size > 0 %}blog__topics-link--has-children{% endif %} article-tags__link" href="{{ link.url }}">{{ link.title }}</a>
+          {%- if link.links.size > 0 -%}
+            <ul>
+              <li><a class="blog__topics-link article-tags__link" href="{{ link.url }}">All {{ link.title }}</a></li>
+              {%- for child_link in link.links -%}
+                <li><a class="blog__topics-link article-tags__link" href="{{ child_link.url }}">{{ child_link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% comment %}
+  <div data-has-toggle-option>
+    <h3 class="sidebar-block__heading" {% if settings.toggle_sidebar %}data-sidebar-block__toggle="closed" aria-label="toggle"{% endif %}>
+      {{ linklists[menu].title }}
+      {% if settings.toggle_sidebar %}
+        <button class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+          {% if settings.toggle_icon_style == 'plus_and_minus' %}
+            {% render 'icon',
+                    name: 'plus',
+                    icon_class: 'icon--active'
+            %}
+            {% render 'icon', name: 'minus' %}
+          {% else %}
+            {% render 'icon',
+                    name: 'down-caret',
+                    icon_class: 'icon--active'
+            %}
+          {% endif %}
+        </button>
+      {% endif %}
+    </h3>
+  </div>
+  <ul class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    {% for link in linklists[menu].links %}
+      <li class="sidebar-block__item">
+        <a {% if link.active %}class="active"{% endif %} href="{{ link.url }}" title="{{ link.title | escape }}">
+          {{ link.title }}
+        </a>
+                {%- if link.links.size > 0 -%}
+          <ul>
+            <li><a class="blog__topics-link article-tags__link" href="{{ link.url }}">All {{ link.title }}</a></li>
+            {%- for child_link in link.links -%}
+              <li><a class="blog__topics-link article-tags__link" href="{{ child_link.url }}">{{ child_link.title }}</a></li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </li>
+    {% endfor %}
+  </ul>
+{% endcomment %}   
+{% else %}
+  <div data-has-toggle-option>
+    <h3 class="sidebar-block__heading" {% if settings.toggle_sidebar %}data-sidebar-block__toggle="closed" aria-label="toggle"{% endif %}>
+      {{ 'homepage.onboarding.menu_title' | t }}
+      {% if settings.toggle_sidebar %}
+        <button class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+          {% if settings.toggle_icon_style == 'plus_and_minus' %}
+            {% render 'icon',
+                    name: 'plus',
+                    icon_class: 'icon--active'
+            %}
+            {% render 'icon', name: 'minus' %}
+          {% else %}
+            {% render 'icon',
+                    name: 'down-caret',
+                    icon_class: 'icon--active'
+            %}
+          {% endif %}
+        </button>
+      {% endif %}
+    </h3>
+  </div>
+  <ul class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    <li><p>{{ 'homepage.onboarding.no_content' | t }}</p></li>
+  </ul>
+{% endif %}

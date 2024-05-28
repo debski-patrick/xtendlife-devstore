@@ -1,0 +1,9 @@
+{% if collection.metafields["custom_fields"]["video"] != blank %}
+  <div class="custom-field custom-field__video custom-field__type--multi-line-text-field">
+    <h3 class="custom-field--title">Video</h3>
+    <div class="custom-field--value">
+      {{ collection.metafields["custom_fields"]["video"] }}
+
+    </div>
+  </div>
+{% endif %}

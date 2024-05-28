@@ -1,0 +1,50 @@
+<div class="account-orders-table">
+    <table class="paginated">
+      <thead>
+        <tr>
+          <th>{{ 'customer.orders.order_number' | t }} #</th>
+          <th>{{ 'customer.orders.date' | t }}</th>
+          <th>{{ 'customer.orders.total' | t }}</th>
+          <th class="small-down--hidden">{{ 'customer.orders.payment_status' | t }}</th>        
+          <th class="account-order-status small-down--hidden">{{ 'customer.orders.fulfillment_status' | t }}</th>
+          {% if template == 'customers/account'%}
+          <th><span class="small-down--hidden">{{ 'customer.orders.re_order' | t }}</span><span class="hide small-down--visible">{{ 'customer.orders.details' | t }}</span></th>
+          {% else %}       
+          <th><span class="small-down--hidden">{{ 'customer.orders.order_details' | t }}</span><span class="hide small-down--visible">{{ 'customer.orders.details' | t }}</span></th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% if template == 'customers/account'%}
+        {% assign limit = 5 %}
+        {% else %}
+        {% assign limit = 2000 %}
+      {% endif %}
+        {% paginate customer.orders by limit %}
+          {% for order in customer.orders %}
+            <tr class="order_year_tr" data-orderdate="{{ order.created_at | date: "%Y" }}">
+              {% if template == 'customers/account'%}
+              <td><span class="order_number">{{ order.name | replace:'#',''}}</span><br><a class="view_order_detail small-down--hidden" href="{{ order.customer_url }}">{{ 'customer.orders.view_details' | t }}</a></td>
+              {% else %}
+              <td>{{ order.name | replace:'#',''}}</td>
+              {% endif %}
+              <td>{{ order.created_at | date: "%-m/%d/%Y" }}</td>
+              <td>{{ order.total_price | money }}</td>
+              <td class="small-down--hidden">{{ order.financial_status | capitalize }}</td>     
+              {% if order.cancelled %}
+              <td class="account-order-status small-down--hidden">{{ 'customer.orders.cancelled' | t }}</td>
+              {% else %}
+              <td class="account-order-status-{{ order.fulfillment_status_label | downcase}} small-down--hidden"><p>{{ order.fulfillment_status_label }}</p></td>
+              {% endif %}
+              {% if template == 'customers/account'%}
+              <td class="small-down--hidden js-product">{% include 'smoothie-reorder' %}</td>
+              <td class="hide small-down--visible"><a class="view_order_detail" href="{{ order.customer_url }}">{{ 'customer.orders.view' | t }}</a></td>
+              {% else %}       
+              <td><a class="view_order_detail" href="{{ order.customer_url }}"><span class="small-down--hidden">{{ 'customer.orders.view_details' | t }}</span><span class="hide small-down--visible">{{ 'customer.orders.view' | t }}</span></a></td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        {% endpaginate %}
+      </tbody>
+    </table>
+  </div>  

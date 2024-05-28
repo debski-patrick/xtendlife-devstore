@@ -1,0 +1,105 @@
+<style>
+    .video-text-{{section.id}} .sectionMargin {
+      margin-top: 30px;
+      margin-bottom: 0;
+    }
+    .video-text-{{section.id}} h2 {
+      color: #3f7cbf;
+      font-weight: 600;
+      margin: 30px 0 10px;
+      font-size: 1.5rem;
+    }
+    .video-text-{{section.id}} .image-with-text_content p{
+      margin-bottom: 15px;
+    }
+    .video-text-{{section.id}} .image-with-text_content p:last-child{
+      margin-bottom: 0px;
+    }
+    @media only screen and (min-width: 600px){
+      .video-text-{{section.id}} .row.flex {
+        display: flex;
+        align-items: center;
+      }
+    }
+    @media only screen and (max-width: 767px){
+      .video-text-{{section.id}} h2 {
+        font-size: 1.1rem;
+      }
+      .video-text-{{section.id}} .image-with-text_content p{
+        font-size: .875rem;
+      }
+    }
+  </style>
+  <div class="video-text-{{section.id}}">
+    <div class="section">
+      <div class="row flex is-justify-space-between equal-columns--outside-trim sectionMargin">
+      {% if section.settings.horizontal_alignment == 'left' %}
+        <div class="one-half medium-down--one-whole display-flex-row">
+          <div class="image-with-text_image_1 embed-container"><iframe src="{{ section.settings.video }}" class="embedded-responsive" data-dashlane-frameid="1623" allowfullscreen="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe></div>
+        </div>
+      {% endif %}
+        <div class="one-half medium-down--one-whole display-flex-row">
+          <div class="image-with-text_content">
+            <h2>{{ section.settings.title }}</h2>
+            {{ section.settings.description }}
+          </div>
+        </div>
+        {% if section.settings.horizontal_alignment == 'right' %}
+          <div class="one-half medium-down--one-whole display-flex-row">
+            <div class="image-with-text_image_1 embed-container"><iframe src="{{ section.settings.video }}" class="embedded-responsive" data-dashlane-frameid="1623" allowfullscreen="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0"></iframe></div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Video with text V1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "video",
+        "label": "Video",
+        "info": "YouTube and Vimeo Embed URL"
+      },
+      {
+        "type": "select",
+        "id": "horizontal_alignment",
+        "label": "Horizontal alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Video",
+      "name": "Video with text V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

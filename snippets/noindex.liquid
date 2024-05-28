@@ -1,0 +1,12 @@
+{% assign noindexUrls = "blogs/health-articles/tagged,pages/customer-reviews,pages/no-risk-guarantee,pages/payment-options,pages/dermatologically-tested-and-cruelty-free,pages/purity-effectiveness,pages/search-results-page,pages/a1,pages/a2,pages/b1,pages/l1" | split:"," %}
+{% assign noindexUrl = false %}
+{% for item in noindexUrls %}
+	{% if request.path contains item  %}
+		<meta name="robots" content="noindex, nofollow" />
+        {% assign noindexUrl = true %}
+        {% break %}
+	{% endif %}
+{% endfor %}
+{% if noindexUrl == false  %}
+  <meta name="robots" content="index,follow">
+{% endif %}

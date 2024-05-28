@@ -1,0 +1,2923 @@
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ 766:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+var __webpack_unused_export__;
+
+__webpack_unused_export__ = true;
+var EventHandler = /** @class */ (function () {
+    function EventHandler() {
+        this.events = [];
+    }
+    EventHandler.prototype.register = function (el, event, listener) {
+        if (!el || !event || !listener)
+            return null;
+        this.events.push({ el: el, event: event, listener: listener });
+        el.addEventListener(event, listener);
+        return { el: el, event: event, listener: listener };
+    };
+    EventHandler.prototype.unregister = function (_a) {
+        var el = _a.el, event = _a.event, listener = _a.listener;
+        if (!el || !event || !listener)
+            return null;
+        this.events = this.events.filter(function (e) { return el !== e.el
+            || event !== e.event || listener !== e.listener; });
+        el.removeEventListener(event, listener);
+        return { el: el, event: event, listener: listener };
+    };
+    EventHandler.prototype.unregisterAll = function () {
+        this.events.forEach(function (_a) {
+            var el = _a.el, event = _a.event, listener = _a.listener;
+            return el.removeEventListener(event, listener);
+        });
+        this.events = [];
+    };
+    return EventHandler;
+}());
+exports.Z = EventHandler;
+
+
+/***/ }),
+
+/***/ 722:
+/***/ (() => {
+
+
+class VariantSelection extends HTMLElement {
+  static get observedAttributes() {
+    return ['variant'];
+  }
+
+  constructor() {
+    super();
+    this._loaded = false;
+    this._productFetcher = Promise.resolve(false);
+
+    this._onMainElChange = event => {
+      this.variant = event.currentTarget.value;
+    };
+
+    const mainInputEl = this.querySelector('input[data-variants]');
+    this._mainEl = mainInputEl || this.querySelector('select[data-variants]');
+  }
+
+  set variant(value) {
+    if (value) {
+      this.setAttribute('variant', value);
+    } else {
+      this.removeAttribute('variant');
+    }
+  }
+
+  get variant() {
+    return this.getAttribute('variant');
+  }
+
+  connectedCallback() {
+    this._productFetcher = this._fetchProduct();
+    const mainInputEl = this.querySelector('input[data-variants]');
+    this._mainEl = mainInputEl || this.querySelector('select[data-variants]');
+
+    this._mainEl.addEventListener('change', this._onMainElChange);
+
+    this.variant = this._mainEl.value;
+  }
+
+  disconnectedCallback() {
+    this._mainEl.removeEventListener('change', this._onMainElChange);
+
+    this._mainEl = null;
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    switch (name) {
+      case 'variant':
+        this._changeVariant(newValue);
+
+        break;
+    }
+  }
+
+  getProduct() {
+    return this._loaded ? Promise.resolve(this._product) : this._productFetcher;
+  }
+
+  getVariant() {
+    return this.getProduct().then(product => product ? product.variants.find(v => v.id.toString() === this.variant) || false : false).catch(() => false);
+  }
+
+  getState() {
+    return this.getVariant().then(variant => variant ? 'selected' : this.getAttribute('variant'));
+  }
+
+  _changeVariant(value) {
+    this._dispatchEvent(value).then(() => {
+    this._mainEl.value = value;
+    });
+  }
+
+  _fetchProduct() {
+    return fetch(this.getAttribute('product-url')).then(response => response.json()).then(product => {
+      this._product = product;
+      return product;
+    }).catch(() => {
+      this._product = null;
+    }).finally(() => {
+      this._loaded = true;
+    });
+  }
+
+  _dispatchEvent(value) {
+    return this.getProduct().then(product => {
+      const variant = product ? product.variants.find(v => v.id.toString() === value) || false : false;
+      const state = variant ? 'selected' : value;
+      const event = new CustomEvent('variant-change', {
+        detail: {
+          product,
+          variant,
+          state
+        }
+      });
+      this.dispatchEvent(event);
+    });
+  }
+
+}
+
+const valueElementType = {
+  select: 'option',
+  radio: 'input[type="radio"]'
+};
+
+function setSelectedOptions(selectOptions, radioOptions, selectedOptions) {
+  selectOptions.forEach(({
+    option
+  }) => {
+    option.value = selectedOptions[parseInt(option.dataset.variantOptionIndex, 10)];
+  });
+  radioOptions.forEach(({
+    values
+  }) => {
+    values.forEach(value => {
+      value.checked = value.value === selectedOptions[parseInt(value.dataset.variantOptionValueIndex, 10)];
+    });
+  });
+}
+
+function getOptions(optionsEls) {
+  const select = [];
+  const radio = [];
+
+  for (let i = 0; i < optionsEls.length; i++) {
+    const optionEl = optionsEls[i];
+    const wrappers = optionEl.matches('[data-variant-option-value-wrapper]') ? [optionEl] : Array.prototype.slice.call(optionEl.querySelectorAll('[data-variant-option-value-wrapper]'));
+    const values = optionEl.matches('[data-variant-option-value]') ? [optionEl] : Array.prototype.slice.call(optionEl.querySelectorAll('[data-variant-option-value]'));
+    if (!values.length) break;
+    const option = {
+      option: optionEl,
+      wrappers,
+      values
+    };
+
+    if (values[0].matches(valueElementType.select)) {
+      select.push(option);
+    } else if (values[0].matches(valueElementType.radio)) {
+      radio.push(option);
+    }
+  }
+
+  return {
+    select,
+    radio
+  };
+}
+
+function getSelectedOptions(product, selectOptions, radioOptions) {
+  const options = product.options.map(() => 'not-selected');
+  selectOptions.forEach(({
+    option
+  }) => {
+    if (option.value !== 'not-selected') {
+      options[parseInt(option.dataset.variantOptionIndex, 10)] = option.value;
+    }
+  });
+  radioOptions.forEach(({
+    values
+  }) => {
+    values.forEach(value => {
+      if (value.checked) {
+        options[parseInt(value.dataset.variantOptionValueIndex, 10)] = value.value;
+      }
+    });
+  });
+  return options;
+}
+
+function getVariantFromSelectedOptions(variants, selectedOptions) {
+  for (let i = 0; i < variants.length; i++) {
+    const variant = variants[i];
+    const isVariant = variant.options.every((option, index) => option === selectedOptions[index]);
+    if (isVariant) return variant; // We found the variant
+  }
+
+  return false;
+}
+
+function _getVariant(variants, options) {
+  return variants.find(variant => variant.options.every((option, index) => option === options[index]));
+}
+
+function _setOptionsMap(product, selectedOptions, optionsMap, option1, option2 = null, option3 = null) {
+  const updatedOptionsMap = { ...optionsMap
+  };
+  const options = [option1, option2, option3].filter(option => !!option);
+
+  const variant = _getVariant(product.variants, options);
+
+  const variantOptionMatches = options.filter((option, index) => option === selectedOptions[index]).length;
+  const isCurrentVariant = variantOptionMatches === product.options.length;
+  const isNeighbor = variantOptionMatches === product.options.length - 1;
+
+  for (let i = 0; i < options.length; i++) {
+    const option = options[i];
+
+    if (option) {
+      let {
+        setByCurrentVariant,
+        setByNeighbor,
+        accessible,
+        available
+      } = optionsMap[i][option];
+
+      if (variant) {
+        accessible = variant.available || accessible; // The current variant is always
+        // the priority for option availability
+
+        if (isCurrentVariant) {
+          setByCurrentVariant = true;
+          ({
+            available
+          } = variant);
+        } else if (!setByCurrentVariant && isNeighbor) {
+          // If the variant is a neighbor
+          // And the option doesn't belong to the variant
+          // Use its availability information for the option
+          // If multiple neighbors exist, prefer true
+          available = setByNeighbor ? available || variant.available : variant.available;
+          setByNeighbor = true;
+        }
+      } else if (isCurrentVariant) {
+        // Catch case where current variant doesn't exist
+        // Ensure availability is false
+        setByCurrentVariant = true;
+        available = false;
+      } else if (!setByCurrentVariant && isNeighbor) {
+        // Catch case where neighbor doesn't exist
+        // Ensure availability is false
+        // If multiple neighbors exist, prefer true
+        available = setByNeighbor ? available : false;
+        setByNeighbor = true;
+      } // If the option isn't set by either
+      // the current variant or a neighbor
+      // default to general accessibility
+
+
+      if (!setByCurrentVariant && !setByNeighbor) {
+        available = accessible;
+      }
+
+      updatedOptionsMap[i][option] = {
+        setByCurrentVariant,
+        setByNeighbor,
+        accessible,
+        available
+      };
+    }
+  }
+
+  return updatedOptionsMap;
+}
+
+function getOptionsAccessibility(product, selectedOptions) {
+  let optionsMap = product.options.map(() => ({}));
+
+  for (let i = 0; i < product.options.length; i++) {
+    for (let j = 0; j < product.variants.length; j++) {
+      const variant = product.variants[j];
+      const option = variant.options[i];
+      optionsMap[i][option] = {
+        setByCurrentVariant: false,
+        setByNeighbor: false,
+        accessible: false,
+        available: false
+      };
+    }
+  }
+
+  const option1Values = optionsMap.length >= 1 ? Object.keys(optionsMap[0]) : [];
+  const option2Values = optionsMap.length >= 2 ? Object.keys(optionsMap[1]) : [];
+  const option3Values = optionsMap.length >= 3 ? Object.keys(optionsMap[2]) : [];
+  option1Values.forEach(option1Value => {
+    option2Values.forEach(option2Value => {
+      option3Values.forEach(option3Value => {
+        optionsMap = _setOptionsMap(product, selectedOptions, optionsMap, option1Value, option2Value, option3Value);
+      });
+
+      if (!option3Values.length) {
+        optionsMap = _setOptionsMap(product, selectedOptions, optionsMap, option1Value, option2Value);
+      }
+    });
+
+    if (!option2Values.length) {
+      optionsMap = _setOptionsMap(product, selectedOptions, optionsMap, option1Value);
+    }
+  });
+  return optionsMap;
+}
+
+function updateOptions(product, selectOptions, radioOptions, selectedOptions, disableUnavailableOptions, removeUnavailableOptions) {
+  const options = [...selectOptions, ...radioOptions];
+
+  if (options.length === 0) {
+    return;
+  }
+
+  const optionsAccessibility = getOptionsAccessibility(product, selectedOptions); // Iterate over each option type
+
+  for (let i = 0; i < product.options.length; i++) {
+    // Corresponding select dropdown, if it exists
+    const optionValues = options.find(({
+      option
+    }) => {
+      if (parseInt(option.dataset.variantOptionIndex, 10) === i) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (optionValues) {
+      const fragment = document.createDocumentFragment();
+      const {
+        option,
+        wrappers,
+        values
+      } = optionValues;
+
+      for (let j = values.length - 1; j >= 0; j--) {
+        const wrapper = wrappers[j];
+        const optionValue = values[j];
+        const {
+          value
+        } = optionValue;
+        const {
+          available
+        } = value in optionsAccessibility[i] ? optionsAccessibility[i][value] : false;
+        const {
+          accessible
+        } = value in optionsAccessibility[i] ? optionsAccessibility[i][value] : false;
+        const isChooseOption = value === 'not-selected'; // Option element to indicate unchosen option
+        // Disable unavailable options
+
+        optionValue.disabled = isChooseOption || disableUnavailableOptions && !accessible;
+        optionValue.dataset.variantOptionAccessible = accessible;
+        optionValue.dataset.variantOptionAvailable = available;
+
+        if (!removeUnavailableOptions || accessible || isChooseOption) {
+          fragment.insertBefore(wrapper, fragment.firstElementChild);
+        }
+      }
+
+      option.innerHTML = '';
+      option.appendChild(fragment);
+      const chosenValue = values.find(value => value.selected || value.checked);
+      option.dataset.variantOptionChosenValue = chosenValue && chosenValue.value !== 'not-selected' ? chosenValue.value : false;
+    }
+  }
+}
+
+class OptionsSelection extends HTMLElement {
+  static get observedAttributes() {
+    return ['variant-selection', 'disable-unavailable', 'remove-unavailable'];
+  }
+
+  static synchronize(mainOptionsSelection) {
+    const mainVariantSelection = mainOptionsSelection.getVariantSelection(); // Fast return if we aren't associated with a variant selection
+
+    if (!mainVariantSelection) return Promise.resolve(false);
+    return mainOptionsSelection.getSelectedOptions().then(selectedOptions => {
+      // Update all other options selects associated with the same variant ui
+      const optionsSelections = document.querySelectorAll('options-selection');
+      optionsSelections.forEach(optionsSelection => {
+        if (optionsSelection !== mainOptionsSelection && optionsSelection.getVariantSelection() === mainVariantSelection) {
+          optionsSelection.setSelectedOptions(selectedOptions);
+        }
+      });
+    }).then(() => true);
+  }
+
+  constructor() {
+    super();
+    this.style.display = '';
+    this._events = [];
+    this._onChangeFn = this._onOptionChange.bind(this);
+    this._optionsEls = this.querySelectorAll('[data-variant-option]');
+    ({
+      select: this._selectOptions,
+      radio: this._radioOptions
+    } = getOptions(this._optionsEls));
+
+    this._associateVariantSelection(this.getAttribute('variant-selection'));
+  }
+
+  set variantSelection(value) {
+    if (value) {
+      this.setAttribute('variant-selection', value);
+    } else {
+      this.removeAttribute('variant-selection');
+    }
+  }
+
+  get variantSelection() {
+    return this.getAttribute('variant-selection');
+  }
+
+  connectedCallback() {
+    this._optionsEls = this.querySelectorAll('[data-variant-option]');
+    ({
+      select: this._selectOptions,
+      radio: this._radioOptions
+    } = getOptions(this._optionsEls));
+
+    this._associateVariantSelection(this.getAttribute('variant-selection'));
+
+    this._selectOptions.forEach(({
+      option
+    }) => {
+      option.addEventListener('change', this._onChangeFn);
+
+      this._events.push({
+        el: option,
+        fn: this._onChangeFn
+      });
+    });
+
+    this._radioOptions.forEach(({
+      values
+    }) => {
+      values.forEach(value => {
+        value.addEventListener('change', this._onChangeFn);
+
+        this._events.push({
+          el: value,
+          fn: this._onChangeFn
+        });
+      });
+    });
+
+    this._onOptionChange();
+  }
+
+  disconnectedCallback() {
+    this._resetOptions();
+
+    this._events.forEach(({
+      el,
+      fn
+    }) => el.removeEventListener('change', fn));
+
+    this._events = [];
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    switch (name) {
+      case 'variant-selection':
+        this._associateVariantSelection(newValue);
+
+        break;
+
+      case 'disable-unavailable':
+      case 'remove-unavailable':
+        this._updateOptions(this.hasAttribute('disable-unavailable'), this.hasAttribute('remove-unavailable'));
+
+        break;
+    }
+  }
+
+  getSelectedOptions() {
+    if (!this._variantSelection) return Promise.resolve(null);
+    return this._variantSelection.getProduct().then(product => {
+      if (!product) return null;
+      return getSelectedOptions(product, this._selectOptions, this._radioOptions);
+    });
+  }
+
+  getVariantSelection() {
+    return this._variantSelection;
+  }
+
+  setSelectedOptions(selectedOptions) {
+    setSelectedOptions(this._selectOptions, this._radioOptions, selectedOptions);
+    return this._updateOptions(this.hasAttribute('disable-unavailable'), this.hasAttribute('remove-unavailable'), selectedOptions);
+  }
+
+  _associateVariantSelection(id) {
+    this._variantSelection = id ? document.getElementById(id) : this.closest('variant-selection');
+  }
+
+  _updateLabels() {
+    // Update any labels
+    for (let i = 0; i < this._optionsEls.length; i++) {
+      const optionsEl = this._optionsEls[i];
+      let optionsNameEl = null;
+      let {
+        parentElement
+      } = optionsEl;
+
+      while (parentElement && !optionsNameEl) {
+        const tmpOptionsNameEl = parentElement.querySelector('[data-variant-option-name]');
+
+        if (tmpOptionsNameEl) {
+          optionsNameEl = tmpOptionsNameEl;
+        }
+
+        ({
+          parentElement
+        } = parentElement);
+      }
+
+      if (optionsNameEl) {
+        optionsNameEl.dataset.variantOptionChosenValue = optionsEl.dataset.variantOptionChosenValue;
+
+        if (optionsEl.dataset.variantOptionChosenValue !== 'false') {
+          optionsNameEl.innerHTML = optionsNameEl.dataset.variantOptionName;
+          const optionNameValueSpan = optionsNameEl.querySelector('span');
+
+          if (optionNameValueSpan) {
+            optionNameValueSpan.innerHTML = optionsEl.dataset.variantOptionChosenValue;
+          }
+        } else {
+          optionsNameEl.innerHTML = optionsNameEl.dataset.variantOptionChooseName;
+        }
+      }
+    }
+  }
+
+  _resetOptions() {
+    return this._updateOptions(false, false);
+  }
+
+  _updateOptions(disableUnavailableOptions, removeUnavailableOptions, selectedOptions = null) {
+    if (!this._variantSelection) return Promise.resolve(false);
+    return this._variantSelection.getProduct().then(product => {
+      updateOptions(product, this._selectOptions, this._radioOptions, selectedOptions || getSelectedOptions(product, this._selectOptions, this._radioOptions), disableUnavailableOptions, removeUnavailableOptions);
+
+      this._updateLabels();
+    }).then(() => true);
+  }
+
+  _updateVariantSelection(product, selectedOptions) {
+    if (!this._variantSelection) return;
+    const variant = getVariantFromSelectedOptions(product.variants, selectedOptions);
+    const isNotSelected = selectedOptions.some(option => option === 'not-selected'); // Update master select
+
+    if (variant) {
+      this._variantSelection.variant = variant.id;
+      
+    } else {
+      this._variantSelection.variant = isNotSelected ? 'not-selected' : 'unavailable';
+    }
+  }
+
+  _onOptionChange() {
+    if (!this._variantSelection) return;
+
+    this._variantSelection.getProduct().then(product => {
+      if (!product) return;
+      const selectedOptions = getSelectedOptions(product, this._selectOptions, this._radioOptions);
+
+      this._updateOptions(this.hasAttribute('disable-unavailable'), this.hasAttribute('remove-unavailable'), selectedOptions);
+
+      this._updateVariantSelection(product, selectedOptions);
+      console.log(selectedOptions);
+      OptionsSelection.synchronize(this);
+    });
+  }
+
+}
+
+if (!customElements.get('variant-selection')) {
+  customElements.define('variant-selection', VariantSelection);
+}
+
+if (!customElements.get('options-selection')) {
+  customElements.define('options-selection', OptionsSelection);
+}
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+
+// EXTERNAL MODULE: ./node_modules/@pixelunion/shopify-variants-ui/dist/index.es.js
+var index_es = __webpack_require__(722);
+;// CONCATENATED MODULE: ./node_modules/@shopify/theme-addresses/theme-addresses.js
+/**
+ * CountryProvinceSelector Constructor
+ * @param {String} countryOptions the country options in html string
+ */
+function CountryProvinceSelector(countryOptions) {
+  if (typeof countryOptions !== 'string') {
+    throw new TypeError(countryOptions + ' is not a string.');
+  }
+  this.countryOptions = countryOptions;
+}
+
+/**
+ * Builds the country and province selector with the given node element
+ * @param {Node} countryNodeElement The <select> element for country
+ * @param {Node} provinceNodeElement The <select> element for province
+ * @param {Object} options Additional settings available
+ * @param {CountryProvinceSelector~onCountryChange} options.onCountryChange callback after a country `change` event
+ * @param {CountryProvinceSelector~onProvinceChange} options.onProvinceChange callback after a province `change` event
+ */
+CountryProvinceSelector.prototype.build = function (countryNodeElement, provinceNodeElement, options) {
+  if (typeof countryNodeElement !== 'object') {
+    throw new TypeError(countryNodeElement + ' is not a object.');
+  }
+
+  if (typeof provinceNodeElement !== 'object') {
+    throw new TypeError(provinceNodeElement + ' is not a object.');
+  }
+
+  var defaultValue = countryNodeElement.getAttribute('data-default');
+  options = options || {}
+
+  countryNodeElement.innerHTML = this.countryOptions;
+  countryNodeElement.value = defaultValue;
+
+  if (defaultValue && getOption(countryNodeElement, defaultValue)) {
+    var provinces = buildProvince(countryNodeElement, provinceNodeElement, defaultValue);
+    options.onCountryChange && options.onCountryChange(provinces, provinceNodeElement, countryNodeElement);
+  }
+
+  // Listen for value change on the country select
+  countryNodeElement.addEventListener('change', function (event) {
+    var target = event.target;
+    var selectedValue = target.value;
+    
+    var provinces = buildProvince(target, provinceNodeElement, selectedValue);
+    options.onCountryChange && options.onCountryChange(provinces, provinceNodeElement, countryNodeElement);
+  });
+
+  options.onProvinceChange && provinceNodeElement.addEventListener('change', options.onProvinceChange);
+}
+
+/**
+ * This callback is called after a user interacted with a country `<select>`
+ * @callback CountryProvinceSelector~onCountryChange
+ * @param {array} provinces the parsed provinces
+ * @param {Node} provinceNodeElement province `<select>` element
+ * @param {Node} countryNodeElement country `<select>` element
+ */
+
+ /**
+ * This callback is called after a user interacted with a province `<select>`
+ * @callback CountryProvinceSelector~onProvinceChange
+ * @param {Event} event the province selector `change` event object
+ */
+
+/**
+ * Returns the <option> with the specified value from the
+ * given node element
+ * A null is returned if no such <option> is found
+ */
+function getOption(nodeElement, value) {
+  return nodeElement.querySelector('option[value="' + value +'"]')
+}
+
+/**
+ * Builds the options for province selector
+ */
+function buildOptions (provinceNodeElement, provinces) {
+  var defaultValue = provinceNodeElement.getAttribute('data-default');
+
+  provinces.forEach(function (option) {
+    var optionElement = document.createElement('option');
+    optionElement.value = option[0];
+    optionElement.textContent = option[1];
+
+    provinceNodeElement.appendChild(optionElement);
+  })
+
+  if (defaultValue && getOption(provinceNodeElement, defaultValue)) {
+    provinceNodeElement.value = defaultValue;
+  }
+}
+
+/**
+ * Builds the province selector
+ */
+function buildProvince (countryNodeElement, provinceNodeElement, selectedValue) {
+  var selectedOption = getOption(countryNodeElement, selectedValue);
+  var provinces = JSON.parse(selectedOption.getAttribute('data-provinces'));
+
+  provinceNodeElement.options.length = 0;
+
+  if (provinces.length) {
+    buildOptions(provinceNodeElement, provinces)
+  }
+
+  return provinces;
+}
+
+// EXTERNAL MODULE: ./node_modules/@pixelunion/events/dist/EventHandler.js
+var EventHandler = __webpack_require__(766);
+;// CONCATENATED MODULE: ./source/scripts/utilities/ShippingCalculator.js
+
+
+
+class ShippingCalculator {
+  constructor({ el }) {
+    this.el = el;
+    this.events = new EventHandler/* default */.Z();
+    this.rates = this.el.querySelector('[data-shipping-rates]');
+    this.message = this.el.querySelector('[data-shipping-message]');
+    this.zip = this.el.querySelector('[data-shipping-calculator-zipcode]');
+    this.submit = this.el.querySelector('.get-rates');
+    this.response = this.el.querySelector('[data-shipping-calculator-response]');
+    this.countrySelect = this.el.querySelector('[data-shipping-calculator-country]');
+    this.provinceSelect = this.el.querySelector('[data-shipping-calculator-province]');
+    this.provinceContainer = this.el.querySelector('[data-shipping-calculator-province-container]');
+
+    this.buildCalculator();
+  }
+
+  buildCalculator() {
+    this.shippingCountryProvinceSelector = new CountryProvinceSelector(this.countrySelect.innerHTML);
+    this.shippingCountryProvinceSelector
+      .build(
+        this.countrySelect,
+        this.provinceSelect,
+        {
+          onCountryChange: provinces => {
+            if (provinces.length) {
+              this.provinceContainer.style.display = 'block';
+            } else {
+              this.provinceContainer.style.display = 'none';
+            }
+
+            // "Province", "State", "Region", etc. and "Postal Code", "ZIP Code", etc.
+            // Even countries without provinces include a label.
+            const { label, zip_label: zipLabel } = window.Countries[this.countrySelect.value];
+            this.provinceContainer.querySelector('label[for="address_province"]').innerHTML = label;
+            this.el.querySelector('label[for="address_zip"]').innerHTML = zipLabel;
+          },
+        },
+      );
+
+    this.events.register(this.submit, 'click', e => {
+      e.preventDefault();
+      this.getRates();
+    });
+  }
+
+  getRates() {
+    const shippingAddress = {};
+    shippingAddress.country = this.countrySelect ? this.countrySelect.value : '';
+    shippingAddress.province = this.provinceSelect ? this.provinceSelect.value : '';
+    shippingAddress.zip = this.zip ? this.zip.value : '';
+
+    const queryString = Object.keys(shippingAddress)
+      .map(key => `${encodeURIComponent(`shipping_address[${key}]`)}=${encodeURIComponent(shippingAddress[key])}`)
+      .join('&');
+
+    fetch(`${window.PXUTheme.routes.cart_url}/shipping_rates.json?${queryString}`)
+      .then(response => response.json())
+      .then(data => this.displayRates(data));
+  }
+
+  displayRates(rates) {
+    const propertyName = Object.keys(rates);
+    this.clearRates();
+
+    if (propertyName[0] === 'shipping_rates') {
+      rates.shipping_rates.forEach(rate => {
+        const rateLi = document.createElement('li');
+        rateLi.innerHTML = `${rate.name}: ${this.formatPrice(rate.price)}`;
+        this.rates.appendChild(rateLi);
+      });
+
+      if (rates.shipping_rates.length > 1) {
+        this.message.innerHTML = `${window.PXUTheme.translation.additional_rates_part_1} ${rates.shipping_rates.length} ${window.PXUTheme.translation.additional_rates_part_2} ${this.zip.value}, ${this.provinceSelect.value}, ${this.countrySelect.value}, ${window.PXUTheme.translation.additional_rates_part_3} ${this.formatPrice(rates.shipping_rates[0].price)}`;
+      } else {
+        this.message.innerHTML = `${window.PXUTheme.translation.additional_rate} ${this.zip.value}, ${this.provinceSelect.value}, ${this.countrySelect.value}, ${window.PXUTheme.translation.additional_rate_at} ${this.formatPrice(rates.shipping_rates[0].price)}`;
+      }
+
+      this.response.classList.add('shipping-rates--display-rates');
+    } else {
+      this.message.innerHTML = `Error: ${propertyName[0]} ${rates[propertyName[0]]}`;
+      this.response.classList.add('shipping-rates--display-error');
+    }
+  }
+
+  clearRates() {
+    this.response.classList.remove('shipping-rates--display-error', 'shipping-rates--display-rates');
+    this.message.innerHTML = '';
+    this.rates.innerHTML = '';
+  }
+
+  formatPrice(price) {
+    let formattedPrice;
+
+    if (window.PXUTheme.currency.display_format === 'money_with_currency_format') {
+      formattedPrice = `<span class="money">${window.PXUTheme.currency.symbol}${price} ${window.PXUTheme.currency.iso_code}</span>`;
+    } else {
+      formattedPrice = `<span class="money">${window.PXUTheme.currency.symbol}${price}</span>`;
+    }
+
+    return formattedPrice;
+  }
+
+  unload() {
+    this.events.unregisterAll();
+  }
+}
+
+;// CONCATENATED MODULE: ./source/scripts/app.js
+
+
+
+// Section Shopify window.PXUTheme.theme editor events
+
+$(document)
+.on('shopify:section:reorder', function(e){
+
+  var $target = $(e.target);
+  var $parentSection = $('#shopify-section-' + e.detail.sectionId);
+
+  if (window.PXUTheme.jsHeader.enable_overlay == true) {
+    window.PXUTheme.jsHeader.unload();
+    window.PXUTheme.jsHeader.updateOverlayStyle(window.PXUTheme.jsHeader.sectionUnderlayIsImage());
+  }
+
+});
+
+$(document)
+.on('shopify:section:load', function(e){
+
+  // Shopify section as jQuery object
+  var $section = $(e.target);
+
+  // Vanilla js selection of Shopify section
+  var section = document.getElementById('shopify-section-' + e.detail.sectionId);
+
+  // Blocks within section
+  var $jsSectionBlocks = $section.find('.shopify-section[class*=js]');
+
+  var sectionObjectUrl = $section.find('[data-theme-editor-load-script]').attr('src');
+
+  // Check classes on schema and look for js (eg. jsMap)
+  for (var i = 0; i < section.classList.length; i++) {
+    if (section.classList[i].substring(0, 2) === "js"){
+      var triggerClass = section.classList[i];
+
+      // Check to see if section script exists
+      if (typeof window.PXUTheme[triggerClass] == 'undefined') {
+        // make AJAX call to load script
+        window.PXUTheme.loadScript(triggerClass, sectionObjectUrl, function () {
+          window.PXUTheme[triggerClass].init($(section));
+        });
+      } else {
+        if (window.PXUTheme[triggerClass]) {
+          // console.log('Section: ' + triggerClass + ' has been loaded.')
+          window.PXUTheme[triggerClass].init($(section));
+        } else {
+          // console.warn('Uh oh, ' + triggerClass + ' is referenced in section schema class, but can not be found. Make sure "z__' + triggerClass + '.js" and window.PXUTheme.' + triggerClass + '.init() function exists.');
+        }
+      }
+    }
+  }
+
+  // Check classes on block element and look for js (eg. jsMap)
+  if ($jsSectionBlocks.length > 0) {
+    var $jsSectionBlockNames = $jsSectionBlocks.each(function () {
+      for (var i = 0; i < this.classList.length; i++) {
+        if (this.classList[i].substring(0, 2) === "js") {
+          var triggerClass = this.classList[i];
+          var $block = $('.'+ triggerClass)
+          var blockUrl = $block.find('[data-theme-editor-load-script]').attr('src');
+
+          // Check to see if section script exists
+          if (typeof window.PXUTheme[triggerClass] == 'undefined') {
+            // make AJAX call to load script
+            window.PXUTheme.loadScript(triggerClass, blockUrl, function () {
+              window.PXUTheme[triggerClass].init($block);
+            });
+          } else {
+            if (window.PXUTheme[triggerClass]) {
+              // console.log('Block: ' + triggerClass + ' has been loaded.')
+              window.PXUTheme[triggerClass].init($(this));
+            } else {
+              // console.warn('Uh oh, ' + triggerClass + ' is referenced in block class, but can not be found. Make sure "z__' + triggerClass + '.js" and window.PXUTheme.' + triggerClass + '.init() function exists.');
+            }
+          }
+
+        }
+      }
+    });
+  }
+
+  // Load video feature
+  window.PXUTheme.video.init();
+
+  // Scrolling animations
+  window.PXUTheme.animation.init();
+
+  // Initialize reviews
+  window.PXUTheme.productReviews.init();
+
+  // Object Fit Images
+  window.PXUTheme.objectFitImages.init();
+
+  // Infinite scrolling
+  window.PXUTheme.infiniteScroll.init();
+
+  // Disclosure menus
+  window.PXUTheme.disclosure.enable();
+
+  // Search
+  $(document).on('click',  '[data-show-search-trigger]', function(){
+    window.PXUTheme.jsHeader.showSearch();
+  });
+
+  $('.search-overlay__close').on('click', function(){
+    window.PXUTheme.jsHeader.hideSearch();
+  });
+
+  if (window.PXUTheme.theme_settings.enable_autocomplete == true) {
+    window.PXUTheme.predictiveSearch.init();
+  }
+  // Product review scroll
+  window.PXUTheme.productReviews.productReviewScroll();
+
+});
+
+
+$(document)
+.on('shopify:section:unload', function(e){
+
+  // Shopify section as jQuery object
+  var $section = $(e.target);
+
+  // Vanilla js selection of Shopify section
+  var section = document.getElementById('shopify-section-' + e.detail.sectionId);
+
+  // Blocks within section
+  var $jsSectionBlocks = $section.find('.shopify-section[class*=js]');
+
+  // Check classes on schema and look for js (eg. jsMap)
+  for (var i = 0; i < section.classList.length; i++) {
+    if (section.classList[i].substring(0, 2) === "js"){
+      var triggerClass = section.classList[i];
+      if (window.PXUTheme[triggerClass]) {
+        // console.log('Section: ' + triggerClass + ' is unloaded.')
+        window.PXUTheme[triggerClass].unload($(section));
+      } else {
+        // console.warn('Uh oh, ' + triggerClass + ' is referenced in section schema class, but can not be found. Make sure "z__' + triggerClass + '.js" and window.PXUTheme.' + triggerClass + '.unload() function exists.');
+      }
+    }
+  }
+
+  // Check classes on block element and look for js (eg. jsMap)
+  if ($jsSectionBlocks.length > 0) {
+    var $jsSectionBlockNames = $jsSectionBlocks.each(function () {
+      for (var i = 0; i < this.classList.length; i++) {
+        if (this.classList[i].substring(0, 2) === "js") {
+          var triggerClass = this.classList[i];
+          if (window.PXUTheme[triggerClass]) {
+            // console.log('Block: ' + triggerClass + ' is unloaded.')
+            window.PXUTheme[triggerClass].unload($(this));
+          } else {
+            // console.warn('Uh oh, ' + triggerClass + ' is referenced in block class, but can not be found. Make sure "z__' + triggerClass + '.js" and window.PXUTheme.' + triggerClass + '.unload() function exists.');
+          }
+
+        }
+      }
+    });
+  }
+
+  // Scrolling animations
+  window.PXUTheme.animation.unload($section);
+
+  // QuantityBox
+  window.PXUTheme.quantityBox.unload($section);
+
+  // Infinite scrolling
+  window.PXUTheme.infiniteScroll.unload($section);
+
+  // Disclosure menus
+  window.PXUTheme.disclosure.enable();
+
+});
+
+$(document)
+.on('shopify:section:select', function(e){
+
+  // Shopify section as jQuery object
+  var $section = $(e.target);
+
+  // Vanilla js selection of Shopify section
+  var section = document.getElementById('shopify-section-' + e.detail.sectionId);
+
+  // Force show state when section is selected in theme editor
+  for (var i = 0; i < section.classList.length; i++) {
+    if (section.classList[i].substring(0, 2) === "js") {
+      var triggerClass = section.classList[i];
+      if (window.PXUTheme[triggerClass].showThemeEditorState) {
+        window.PXUTheme[triggerClass].showThemeEditorState(e.detail.sectionId, $section);
+      }
+    }
+  }
+
+  // Predictive search
+  if (window.PXUTheme.theme_settings.enable_autocomplete == true) {
+    window.PXUTheme.predictiveSearch.init();
+  }
+
+  if($('.tabs').length > 0) {
+    window.PXUTheme.tabs.enableTabs();
+  }
+
+  if(isScreenSizeLarge() && window.PXUTheme.jsHeader.enable_overlay === true) {
+    window.PXUTheme.jsHeader.updateOverlayStyle(window.PXUTheme.jsHeader.sectionUnderlayIsImage());
+  }
+
+  if ($('.block__recommended-products').length > 0) {
+    var $productPage = $('.block__recommended-products').parents('.product-page');
+    window.PXUTheme.jsRecommendedProducts.init($productPage);
+  }
+
+});
+
+$(document)
+.on('shopify:section:deselect', function(e){
+
+  // Shopify section as jQuery object
+  var $section = $(e.target);
+
+  // Vanilla js selection of Shopify section
+  var section = document.getElementById('shopify-section-' + e.detail.sectionId);
+
+  // Force hide state when section is selected in theme editor
+  for (var i = 0; i < section.classList.length; i++) {
+    if (section.classList[i].substring(0, 2) === "js") {
+      var triggerClass = section.classList[i];
+      if (window.PXUTheme[triggerClass].showThemeEditorState) {
+        window.PXUTheme[triggerClass].hideThemeEditorState(e.detail.sectionId, $(section));
+      }
+    }
+  }
+
+});
+
+// Block Shopify window.PXUTheme.theme editor events
+
+$(document)
+.on('shopify:block:select', function(e){
+
+  var blockId = e.detail.blockId;
+  var $parentSection = $('#shopify-section-' + e.detail.sectionId);
+  var $block = $('#shopify-section-' + blockId);
+
+  if($('.jsFeaturedPromos').length > 0) {
+    window.PXUTheme.jsFeaturedPromos.blockSelect($parentSection, blockId);
+  }
+
+  if($('.jsSlideshowWithText').length > 0) {
+    window.PXUTheme.jsSlideshowWithText.blockSelect($parentSection, blockId);
+  }
+
+  if ($('.jsSlideshowClassic').length > 0) {
+    window.PXUTheme.jsSlideshowClassic.blockSelect($parentSection, blockId);
+  }
+
+  if($('.jsTestimonials').length > 0) {
+    window.PXUTheme.jsTestimonials.blockSelect($parentSection, blockId);
+  }
+
+  // Sidebar collection multi-tag filter
+  if ($block.hasClass('sidebar__block')) {
+    var $toggleBtn = $block.find('[data-sidebar-block__toggle="closed"]');
+    if ($toggleBtn) {
+      window.PXUTheme.jsSidebar.openSidebarBlock($toggleBtn);
+    }
+  }
+
+  // Predictive search
+  if (window.PXUTheme.theme_settings.enable_autocomplete == true) {
+    window.PXUTheme.predictiveSearch.init();
+  }
+
+  // Scrolling animations
+  window.PXUTheme.animation.init();
+
+  // Object Fit Images
+  window.PXUTheme.objectFitImages.init();
+
+});
+
+$(document)
+.on('shopify:block:deselect', function(e){
+
+  var $block = $('#shopify-section-' + e.detail.blockId);
+
+  if ($block.hasClass('sidebar__block')) {
+    var $toggleBtn = $block.find('[data-sidebar-block__toggle="open"]');
+    if ($toggleBtn) {
+      window.PXUTheme.jsSidebar.closeSidebarBlock($toggleBtn);
+    }
+  }
+
+});
+
+$(document)
+.on('shopify:block:load', function(e){
+
+
+
+});
+
+// Document ready
+$(function() {
+  var $jsSections = $('.shopify-section[class*=js]');
+
+  // Loop through sections with js classes and load them in
+  var $jsSectionNames = $jsSections.each(function () {
+    for (var i = 0; i < this.classList.length; i++) {
+      if (this.classList[i].substring(0, 2) === "js"){
+        var triggerClass = this.classList[i];
+        if (window.PXUTheme[triggerClass]) {
+          // console.log('Section: ' + triggerClass + ' has been loaded.')
+          window.PXUTheme[triggerClass].init($(this));
+        } else {
+          // console.warn('Uh oh, ' + triggerClass + ' is referenced in section schema class, but can not be found. Make sure "z__' + triggerClass + '.js" and window.PXUTheme.' + triggerClass + '.init() function exists.');
+        }
+
+      }
+    }
+  });
+
+  var resizeTimer;
+
+  // Store window width in variable
+  var width = $(window).width(), height = $(window).height();
+
+  $(window).on('resize', function(e) {
+
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+
+      window.PXUTheme.objectFitImages.calculateAspectRatio();
+
+      if (window.PXUTheme.jsHeader.header_layout === 'vertical') {
+        window.PXUTheme.predictiveSearch.alignVerticalSearch()
+      }
+
+      if (!isScreenSizeLarger()){
+        // When 798 or less
+        window.PXUTheme.mobileMenu.init();
+
+      } else {
+
+        // When larger than 798
+        window.PXUTheme.mobileMenu.unload();
+      }
+
+    }, 250);
+
+  });
+
+  //Enable plyr
+  window.PXUTheme.video.init();
+
+  // Predictive search
+  if (window.PXUTheme.theme_settings.enable_autocomplete == true) {
+    window.PXUTheme.predictiveSearch.init();
+  }
+
+  window.PXUTheme.dropdownMenu();
+
+  window.PXUTheme.disclosure.enable();
+
+  // Scrolling animations
+  window.PXUTheme.animation.init();
+
+  // QuantityBox
+  window.PXUTheme.quantityBox.init();
+
+  /* Show associated variant image on hover */
+  if (window.PXUTheme.theme_settings.show_collection_swatches == true) {
+    window.PXUTheme.thumbnail.enableSwatches();
+  }
+
+  /* Show secondary image on hover */
+  if (window.PXUTheme.theme_settings.show_secondary_image == true) {
+    window.PXUTheme.thumbnail.showVariantImage();
+  }
+
+  // Quick shop
+  if (window.PXUTheme.theme_settings.enable_quickshop) {
+    window.PXUTheme.thumbnail.showQuickShop();
+  }
+
+  // Currency converter
+  if (window.PXUTheme.currencyConverter) {
+    window.PXUTheme.currencyConverter.init();
+  }
+
+  //Infinite scrolling
+  if ($('[data-custom-pagination]').length) {
+    window.PXUTheme.infiniteScroll.init();
+  }
+
+  //Select event for native multi currency checkout
+  $('.shopify-currency-form select').on('change', function () {
+    $(this)
+      .parents('form')
+      .submit();
+  });
+
+  // Tabs
+  if($('.tabs').length > 0) {
+    window.PXUTheme.tabs.enableTabs();
+  }
+
+  // Additional checkout buttons
+  if (!isScreenSizeLarge()) {
+    $('.additional-checkout-buttons').addClass('additional-checkout-buttons--vertical');
+  }
+
+  // Accordion
+  if($('.accordion, [data-cc-accordion]').length > 0) {
+    window.PXUTheme.contentCreator.accordion.init();
+  }
+
+  // Backwards compatiblity for Flexslider
+  if($('.slider, .flexslider').length > 0) {
+    window.PXUTheme.contentCreator.slideshow.init();
+  }
+
+  // Object Fit Images
+  window.PXUTheme.objectFitImages.init();
+
+  // Responsive Video
+  window.PXUTheme.responsiveVideo.init();
+
+  // Flickity IOS Fix
+  window.PXUTheme.flickityIosFix();
+
+  // Product review scroll
+  window.PXUTheme.productReviews.productReviewScroll();
+
+  if (window.PXUTheme.theme_settings.shipping_calculator_enabled && document.querySelector('[data-shipping-calculator]')) {
+    const shippingCalculator = new ShippingCalculator({ el: document.querySelector('[data-shipping-calculator]') });
+  }
+});
+
+/*============================================================================
+Slideshow arrows
+==============================================================================*/
+
+if (window.PXUTheme.theme_settings.icon_style == 'icon_solid') {
+  window.arrowShape = 'M95.04 46 21.68 46 48.18 22.8 42.91 16.78 4.96 50 42.91 83.22 48.18 77.2 21.68 54 95.04 54 95.04 46z';
+} else {
+  window.arrowShape = 'M95,48H9.83L41,16.86A2,2,0,0,0,38.14,14L3.59,48.58a1.79,1.79,0,0,0-.25.31,1.19,1.19,0,0,0-.09.15l-.1.2-.06.2a.84.84,0,0,0,0,.17,2,2,0,0,0,0,.78.84.84,0,0,0,0,.17l.06.2.1.2a1.19,1.19,0,0,0,.09.15,1.79,1.79,0,0,0,.25.31L38.14,86A2,2,0,0,0,41,86a2,2,0,0,0,0-2.83L9.83,52H95a2,2,0,0,0,0-4Z';
+}
+
+})();
+
+/******/ })()
+;
+
+/*============================================================================
+Mobile Nav
+==============================================================================*/
+(function (Menu, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.mobileButton = $('.js-mobile-button');
+    $dom.mobileNav = $('.js-mobile-nav');
+    $dom.mobileSlide = $('.js-mobile-nav-slide');
+    $dom.mobileChild = $('.js-mobile-child');
+    $dom.mobileChildMenu = $('.js-mobile-child-menu');
+    $dom.mobileBack = $('.js-mobile-back');
+    //$dom.navChild = $('.js-link-has-child');
+    //$dom.topLevelNav = $('.js-top-level-nav');
+    $dom.siteHeader = $('.site-header');
+  };
+
+  var bindUIActions = function bindUIActions() {    
+    $('body').on('click', function (event) {
+      var $target = $(event.target);
+      if (!$target.parents('.site-header').length) {
+        //$dom.topLevelNav.parent().removeClass('active');
+      }
+    });	
+    $dom.mobileButton.on('click', function (event) {      
+      event.preventDefault();
+      event.stopPropagation();
+      $('html, main, #shopify-section-social-media, .home-newsletter, footer').toggleClass('no-scroll');
+      $('body').toggleClass('menu--is-visible');
+      //Scroll.toggle();
+
+
+      var $self = $(event.currentTarget);
+      $self.toggleClass('header__mobile-button--active');
+      $dom.mobileNav.toggleClass('mobile-nav--active');
+
+      function mobileMenuHeight(){ 
+      	$dom.mobileNav.css('max-height', "".concat(window.innerHeight - $dom.siteHeader.get(0).getBoundingClientRect().bottom, "px"));
+      }   
+   
+      mobileMenuHeight();
+      $(window).on('resize', function(){ 
+          mobileMenuHeight();
+      });
+    });
+
+    $dom.mobileChild.on('click', function (event) {
+      event.preventDefault();
+      var $self = $(event.currentTarget);
+      var activeLevel = parseInt($dom.mobileSlide.attr('data-level'));
+      $dom.mobileChildMenu.removeClass('mobile-menu--child-active');
+      $self.parents('.js-mobile-child-menu').addClass('mobile-menu--child-active');
+      $self.siblings('.js-mobile-child-menu').addClass('mobile-menu--child-active');
+      $dom.mobileSlide.attr('data-level', activeLevel + 1);
+      $('.trust_block').hide();
+      $('.second_menu').hide();
+    });
+
+    $dom.mobileBack.on('click', function (event) {
+      event.preventDefault();
+      var $self = $(event.currentTarget);
+      var activeLevel = parseInt($dom.mobileSlide.attr('data-level'));
+      $dom.mobileSlide.attr('data-level', activeLevel - 1);
+      // Prevents flash of content disappearing. 300 is animation timing.
+      setTimeout(function () {
+        $('.trust_block').show();
+        $('.second_menu').show();
+        $self.closest('.js-mobile-child-menu').removeClass('mobile-menu--child-active');
+      }, 300);
+    });
+
+//     $dom.navChild.on('touchstart touchend', function (event) {
+//       event.preventDefault();
+//     });
+
+//     $dom.topLevelNav.on('click', function (event) {
+//       event.preventDefault();
+
+//       var $self = $(event.currentTarget);
+//       var $parent = $self.parent();
+//       var isOpen = $parent.hasClass('active');
+
+//       $dom.topLevelNav.parent().removeClass('active');
+
+//       if (isOpen) {
+//         $parent.removeClass('active');
+//       } else {
+//         $parent.addClass('active');
+//       }
+
+//       var $siblingElem = $(this).next();
+//       if ($siblingElem.is('.submenu--solo')) {
+//         var positionRight = $('.header__nav').width() - (($(this).outerWidth() + $(this).offset().left) - $('.header__nav').offset().left);
+//         $siblingElem.css('right', positionRight);
+//       }
+//     });
+  };
+
+  var init = function init() {
+    cacheDom();
+    bindUIActions();
+  };
+  cacheDom();
+  bindUIActions();
+
+  Menu.init = init;
+})(window.Menu = window.Menu || {}, jQuery);
+
+//Modal popup
+(function (Modal, $) {
+
+  /**
+    *
+    *   <div class="overlay" data-overlay></div> in theme.liquid
+    *
+    */
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.body = $('body');
+    $dom.modal = $('[data-modal]');
+    $dom.modalShow = $('[data-modal-show]');
+    $dom.modalHide = $('[data-modal-hide]');
+  };
+
+  var show = function show(modalName) {
+    window.Overlay.show();
+    // window.Scroll.lock();
+    $dom.body.attr('data-active-modal', modalName);
+    return $('[data-modal="' + modalName + '"]').fadeIn(300);
+  };
+
+  var hide = function hide() {
+    window.Overlay.hide();
+    // window.Scroll.unlock();
+    $dom.body.removeAttr('data-active-modal');
+    return $dom.modal.fadeOut(300);
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.modalShow.on('click', function (event) {
+      event.preventDefault();
+      window.Modal.show($(this).attr('data-modal-show'));
+    });
+    $dom.modalHide.on('click', function (event) {
+      event.preventDefault();
+      window.Modal.hide();
+    });
+  };
+
+  var init = function init() {
+    
+  };
+
+cacheDom();
+    bindUIActions();
+
+  Modal.init = init;
+  Modal.show = show;
+  Modal.hide = hide;
+})(window.Modal = window.Modal || {}, jQuery);
+(function (Overlay, $) {
+
+  /**
+    *  Dependency: <div class="overlay" data-overlay></div> in theme.liquid,
+    *              components/_overlay.scss
+    *
+    *  Note: _overlay.scss hold the styles for the overlay container
+    *  Note: .overlay has a z-index of 1000, so any modal that needs to appear on top
+    *        of the overlay need to have an z-index of 1001+
+    *
+    *
+    */
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.overlay = $('[data-overlay]');
+  };
+
+  var show = function show() {
+    return $dom.overlay.fadeIn(300);
+  };
+
+  var hide = function hide() {
+    return $dom.overlay.fadeOut(300);
+  };
+
+  var toggle = function toggle() {
+    return $dom.overlay.fadeToggle(300);
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.overlay.on('click', window.Modal.hide);
+  };
+
+  var init = function init() {    
+  };
+
+cacheDom();
+    bindUIActions();
+
+  Overlay.init = init;
+  Overlay.show = show;
+  Overlay.hide = hide;
+  Overlay.toggle = toggle;
+})(window.Overlay = window.Overlay || {}, jQuery);
+
+//Testimonal slider
+(function (Sliders, $) {
+
+  var nextArrowHTML = '<a class="slick-arrow slick-next"><svg aria-hidden="true" focusable="false" role="presentation" class="slick-arrow__icon" width="20px" height="15px" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1171 960q0 13-10 23l-466 466q-10 10-23 10t-23-10l-50-50q-10-10-10-23t10-23l393-393-393-393q-10-10-10-23t10-23l50-50q10-10 23-10t23 10l466 466q10 10 10 23z"/></svg></a>';
+  var prevArrowHTML = '<a class="slick-arrow slick-prev"><svg aria-hidden="true" focusable="false" role="presentation" class="slick-arrow__icon" width="20px" height="15px" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1203 544q0 13-10 23L800 960l393 393q10 10 10 23t-10 23l-50 50q-10 10-23 10t-23-10L631 983q-10-10-10-23t10-23l466-466q10-10 23-10t23 10l50 50q10 10 10 23z"/></svg></a>';
+
+// var nextArrowslick = '<a class="flickity-button flickity-prev-next-button next custom_slick"><svg class="flickity-button-icon" viewBox="0 0 100 100"><path d="M95.04 46 21.68 46 48.18 22.8 42.91 16.78 4.96 50 42.91 83.22 48.18 77.2 21.68 54 95.04 54 95.04 46z" class="arrow" transform="translate(100, 100) rotate(180) "></path></svg></a>';
+//   var prevArrowslick = '<a class="flickity-button flickity-prev-next-button previous custom_slick"><svg class="flickity-button-icon" viewBox="0 0 100 100"><path d="M95.04 46 21.68 46 48.18 22.8 42.91 16.78 4.96 50 42.91 83.22 48.18 77.2 21.68 54 95.04 54 95.04 46z" class="arrow" ></path></svg></a>';
+
+  var productCarouselSettings = {
+    lazyLoad: 'ondemand',
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: true,
+    dots: false,
+    nextArrow: nextArrowHTML,
+    prevArrow: prevArrowHTML,
+    mobileFirst: true,
+    responsive: [{
+      breakpoint: 767,
+      settings: {
+        lazyLoad: 'ondemand',
+        slidesToShow: 2,
+        arrows: true
+      }
+    }, {
+      breakpoint: 991,
+      settings: {
+        lazyLoad: 'ondemand',
+        slidesToShow: 3,
+        arrows: true
+      }
+    }]
+  };
+
+  var testimonialSettings = {
+    slidesToShow: 4,
+    centerMode: true,
+    centerPadding: '120px',
+    slidesToScroll: 3,
+    arrows: true,
+    nextArrow: nextArrowHTML,
+    prevArrow: prevArrowHTML,
+    dots: true,
+    responsive: [ 
+      {
+        breakpoint: 767,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          arrows: true,
+          centerMode: false,
+          centerPadding: '70px',
+          nextArrow: nextArrowHTML,
+    	  prevArrow: prevArrowHTML,
+          dots: true,
+          accessibility:false
+        }
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          centerPadding: '30px',
+          slidesToScroll: 1,
+          dots: true
+        }
+      }
+
+    ]
+  };
+  var bundleSettings = {
+    slidesToShow: 3,
+    slidesToScroll: 3,
+    arrows: true,
+    nextArrow: nextArrowHTML,
+    prevArrow: prevArrowHTML,
+    dots: true,
+    responsive: [ 
+      {
+        breakpoint: 767,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          arrows: true,
+          centerMode: false,
+          centerPadding: '50px',
+          nextArrow: nextArrowHTML,
+    	  prevArrow: prevArrowHTML,
+          dots: true,
+          accessibility:false
+        }
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          centerPadding: '50px',
+          slidesToScroll: 1,
+          dots: true
+        }
+      }
+
+    ]
+  };
+  // var testimonialPageSettings = {
+  //   slidesToShow: 3,
+  //   centerMode: true,
+  //   centerPadding: '160px',
+  //   slidesToScroll: 3,
+  //   arrows: true,
+  //   nextArrow: nextArrowHTML,
+  //   prevArrow: prevArrowHTML,
+  //   dots: true,
+  //   accessibility:false,
+  //   responsive: [ 
+  //     {
+  //       breakpoint: 767,
+  //       settings: {
+  //         slidesToShow: 1,
+  //         slidesToScroll: 1,
+  //         arrows: true,
+  //         nextArrow: nextArrowHTML,
+  //   	  prevArrow: prevArrowHTML,
+  //         dots: false,
+  //         accessibility:false
+  //       }
+  //     },
+  //     {
+  //       breakpoint: 1024,
+  //       settings: {
+  //         slidesToShow: 3,
+  //         slidesToScroll: 1,
+  //         dots: true
+  //       }
+  //     }
+
+  //   ]
+  // };
+
+  var gallerySettings = {
+    slidesToScroll: 1,
+    variableWidth: false,
+    slidesToShow: 3,
+    arrows: false,
+    dots: false,
+    nextArrow: nextArrowHTML,
+    prevArrow: prevArrowHTML,
+    accessibility:false,
+    responsive: [ 
+      {
+        breakpoint: 580,
+        settings: {
+          slidesToShow: 1,
+          centerMode: true,
+          centerPadding: '50px',
+          variableWidth: false,
+          slidesToScroll: 1,
+          arrows: true,
+          dots: true,
+          accessibility:false
+        }
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          arrows: true,
+          dots: false
+        }
+      }
+
+    ]
+  };
+  var $dom = {};
+  var cacheDom = function cacheDom() {      
+    $dom.productCarousel = $('.js-product-carousel');        
+	  $dom.quoteCarousel = $('.quotes-category');
+    // $dom.quoteCarouselPage = $('.quotes-category-page');
+    $dom.galleryCarousel = $('.gallery_slider'); 
+    $dom.bundleCarousel = $('.bundle_slider');
+    $dom.relatedBlogCarousel = $('.related-blogs--content'); 
+  };
+
+  var initSliders = function initSliders() {       
+    $dom.productCarousel.slick(productCarouselSettings);     
+	  $dom.quoteCarousel.slick(testimonialSettings);
+    // $dom.quoteCarouselPage.slick(testimonialPageSettings);
+    $dom.galleryCarousel.slick(gallerySettings);
+    $dom.bundleCarousel.slick(bundleSettings);
+    $dom.relatedBlogCarousel.slick(productCarouselSettings);
+  };
+
+  var initProductCarousel = function initProductCarousel() {
+    $('.js-product-carousel').slick(productCarouselSettings);
+  };
+
+  var init = function init() {    
+    cacheDom();
+    initSliders();
+  };
+  cacheDom();
+    initSliders();
+  Sliders.init = init;
+  
+})(window.Sliders = window.Sliders || {}, jQuery);
+
+
+//See More Categories
+(function () {
+  $('.health-hub__block').hover(function () {
+    let slideUp = $(this).find('.health-hub__description');
+    slideUp.css("height", slideUp.height());
+    slideUp.slideToggle(400);
+  });
+})();
+
+
+(function () {
+  $(document).ready(function () {
+    var healthhubcontainer = function () {
+      var w = document.body.clientWidth;
+      if (w <= 767) {
+        var defaultHeight = 750;
+        var container = $(".health-hub-container");
+        var containerHeight = container.outerHeight();
+        var button = $(".button__read-more");
+        var textHover = button.attr('data-hover');
+        var textStandard = button.text();
+
+
+        container.css({"max-height": defaultHeight, "overflow": "hidden"});
+        var expandableTop = container.offset().top + 300;
+        button.on("click", function () {
+
+          var newHeight = 0;
+          if (container.hasClass("active")) {
+            newHeight = defaultHeight;
+            container.removeClass("active");
+            button.text(textStandard);
+            $("html, body").animate( 
+              { scrollTop: expandableTop }, 500); 
+          } else {
+            newHeight = containerHeight;
+            container.addClass("active");
+            button.text(textHover);
+          }
+          container.animate({
+            "max-height": newHeight
+          }, 500);
+
+        });
+      }
+      else {$(".health-hub-container").removeAttr('style');}
+    }
+    healthhubcontainer(); //remove this if you don't want it called on initial load
+    // jQuery(window).bind('resize orientationchange', healthhubcontainer);
+  })
+})();
+
+//Read More
+(function (ReadMore, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.readMoreButtons = $('.js-read-more-button');
+  };
+
+  var expand = function expand(element) {    
+    var $self = $(element);
+    var $readMoreEl = $self.siblings('.js-read-more');
+    if ($readMoreEl.length) {      
+      $readMoreEl.addClass('read-more--active');
+      $readMoreEl.parent().addClass('read-more--active-within');
+      $self.addClass('hide');
+    }
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.readMoreButtons.on('click', function () {      
+      expand(this);
+    });
+  };
+
+  cacheDom();
+  bindUIActions();
+  $dom.readMoreButtons.parent().addClass('read-more--within');
+
+  //ReadMore.init = init;
+})(window.ReadMore = window.ReadMore || {}, jQuery);
+
+//Collection page filter
+
+(function (Filter, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.filterSearch = $('.js-filter-search');
+    $dom.filterSelect = $('.js-filter-select');
+    $dom.filterSelectExact = $('.js-filter-select-exact');
+    $dom.filterGender = $('.js-filter-gender');
+    $dom.filterAllGenderPet = $('.js-filter-all-gender-pet');
+    $dom.filterLetter = $('.js-filter-letter');
+    $dom.filterable = $('.js-filterable');
+  };
+
+  var filterTargets = function filterTargets(target, dataFilter, option) {
+    var $targetEl = $('.js-filterable[data-filter-name="' + target + '"]');    
+    var $targetChildren = $targetEl.find('[' + dataFilter + ']');    
+    $targetChildren.removeClass('hide');
+    if(option === 'all'){return true;}
+    var $filtered = $targetChildren.filter(function (index, item) {
+      var $item = $(item);
+      if ($item.attr(dataFilter).indexOf(option) === -1) {		
+        $item.addClass('hide');
+        return false;
+      }
+      return true;
+    });
+    return $filtered.length;
+  };
+
+  var filterExact = function filterExact(target, dataFilter, option) {
+    var $targetEl = $('.js-filterable[data-filter-name="' + target + '"]');
+    var $targetChildren = $targetEl.find('[' + dataFilter + ']');
+    $targetChildren.removeClass('hide');
+    $targetChildren.each(function (index, item) {
+      var $item = $(item);
+      if ($item.attr(dataFilter) !== option) {        
+        $item.addClass('hide');
+      }
+    });
+  };
+
+  var filterTags = function filterTags(select) {
+    var $self = $(select);
+    var option = $self.val();
+    var target = $self.attr('data-filter-for');
+    filterTargets(target, 'data-filter-tags', option);
+  };
+
+  var filterTagsExact = function filterTagsExact(select) {
+    var $self = $(select);
+    var option = $self.val();
+    var target = $self.attr('data-filter-for');
+    filterExact(target, 'data-filter-tags', option);
+  };
+
+  var filterSearch = function filterSearch(search) {
+    var $self = $(search);
+    var searchTerm = $self.find('.js-filter-search-input').val().toLowerCase();    
+    var target = $self.attr('data-filter-for');
+    var count = filterTargets(target, 'data-filter-search', searchTerm);
+    var $location = $('.js-filterable[data-filter-name="' + target + '"]');
+    $location.find('.js-no-matches').remove();
+    if (count <= 0) {
+      var _$location = $('.js-filterable[data-filter-name="' + target + '"]');
+      _$location.append($('<div />', { class: 'js-no-matches product-grid__item--full-width u-text-center', html: 'Your search did not match any of our products, you can try the dropdown to filter our products.' }));
+    }
+    $("span.product-count").html(count);
+  };
+
+  var filterGender = function filterGender(button) {
+    var $self = $(button);
+    var gender = $self.val();
+    var target = $self.attr('data-filter-for');
+    filterTargets(target, 'data-filter-gender', gender);
+  };
+
+  var filterAllGenderPet = function filterAllGenderPet(button) {
+    var $self = $(button);
+    var option = $self.val();
+    var target = $self.attr('data-filter-for');
+    filterTargets(target, 'data-filter-all-gender-pet', option);
+  };
+
+  var filterLetter = function filterLetter(button) {
+    var $self = $(button);
+    var letter = $self.val();
+    var target = $self.attr('data-filter-for');
+    filterTargets(target, 'data-filter-letter', letter);
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.filterSelect.on('change', function () {
+      filterTags(this);
+    });
+
+    $dom.filterSelectExact.on('change', function () {
+      filterTagsExact(this);
+    });
+
+    $dom.filterSearch.on('submit', function (event) {
+      event.preventDefault();
+      filterSearch(this);
+    });
+
+    $dom.filterGender.on('click', function () {
+      $(this).parent().find('.js-filter-gender').removeClass('filter__button--active');
+      $(this).addClass('filter__button--active');
+      filterGender(this);
+    });
+
+    $dom.filterAllGenderPet.on('click', function () {
+      $(this).parent().find('.js-filter-all-gender-pet').removeClass('filter__button--active');
+      $(this).addClass('filter__button--active');
+      filterAllGenderPet(this);
+    });
+
+    $dom.filterLetter.on('click', function () {
+      $(this).closest('.js-filter-letters').find('.js-filter-letter').removeClass('filter__letter--active');
+      $(this).addClass('filter__letter--active');
+      filterLetter(this);
+      $('body').trigger('letterFiltered');
+    });
+  };
+
+  var initGender = function initGender() {
+    $dom.filterGender.each(function (index, button) {
+      var $button = $(button);
+      if ($button.val() === 'w') {
+        $button.trigger('click');
+      }
+    });
+  };
+
+  var initAllGenderPet = function initAllGenderPet() {
+    $dom.filterAllGenderPet.each(function (index, button) {
+      var $button = $(button);
+      if ($button.val() === 'all') {
+        $button.trigger('click');
+      }
+    });
+  };
+
+  var init = function init() {    
+  };
+  
+  cacheDom();
+    bindUIActions();
+    initGender();
+    initAllGenderPet();
+
+  //Filter.init = init;
+})(window.Filter = window.Filter || {}, jQuery);
+//Tab
+
+(function (Tabs, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.tabControls = $('.js-tab-control');
+    $dom.tabContents = $('.js-tab-content');
+  };
+
+  var switchTabs = function switchTabs(element) {
+    var $self = $(element);
+    var $parent = $self.closest('.js-tabs');
+    var buttonControl = $self.attr('data-control-for');
+    var $activeContent = $parent.find('.js-tab-content[data-content="' + buttonControl + '"]');
+    var $activeButton = $parent.find('.js-tab-control[data-control-for="' + buttonControl + '"]');
+
+    if ($activeContent.length) {
+      $parent.find('.js-tab-control').removeClass('control--active');
+      $parent.find('.js-tab-content').removeClass('content--active');
+      $activeButton.addClass('control--active');
+      $activeContent.addClass('content--active');
+      window.location.hash = buttonControl;
+    }
+  };
+
+  var initTab = function initTab(hash) {
+    var control = hash.replace('#', '');
+    var $activeContent = $('.js-tab-content[data-content="' + control + '"]');
+    var $activeButton = $('.js-tab-control[data-control-for="' + control + '"]');
+
+    if ($activeContent.length) {
+      $dom.tabControls.removeClass('control--active');
+      $dom.tabContents.removeClass('content--active');
+      $activeButton.addClass('control--active');
+      $activeContent.addClass('content--active');
+    }
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.tabControls.on('click', function (event) {
+      event.preventDefault();
+      switchTabs(this);
+    });
+  };
+
+//   var init = function init() {
+    
+//   };
+
+  cacheDom();
+    $('.js-tabs').find('.tabs__nav').find('li').eq(0).find('.js-tab-control').addClass('control--active');
+    $('.js-tabs').find('.interest__container').find('.js-tab-content').eq(0).addClass('content--active');
+    bindUIActions();
+    initTab(window.location.hash);
+    if (window.history && window.history.pushState) {
+      $(window).on('popstate', function() {
+        var hashLocation = location.hash;
+        initTab(hashLocation);
+        if (hashLocation == '') {
+          var hasclass_tab = '#'+$('.js-tabs').find('.tabs__nav').find('li').eq(0).find('.js-tab-control').data('control-for');
+          initTab(hasclass_tab);
+        }
+      });
+    }
+  
+  //Tabs.init = init;
+})(window.Tabs = window.Tabs || {}, jQuery);
+(function (Tabbed, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.tabControls = $('.js-tabbed-control');
+    $dom.tabContents = $('.js-tabbed-content');
+  };
+
+  var switchTabs = function switchTabs(element) {
+    var $self = $(element);
+    var $parent = $self.closest('.js-tabbed');
+    var buttonControl = $self.attr('data-control-for');
+    var $activeContent = $parent.find('.js-tabbed-content[data-content="' + buttonControl + '"]');
+    var $activeButton = $parent.find('.js-tabbed-control[data-control-for="' + buttonControl + '"]');
+
+    if ($activeContent.length) {
+      $parent.find('.js-tabbed-control').removeClass('control--active');
+      $parent.find('.js-tabbed-content').removeClass('content--active');
+      $activeButton.addClass('control--active');
+      $activeContent.addClass('content--active');
+    }
+  };
+
+  var initTab = function initTab() {
+    var $activeContent = $('.js-tabbed').find('.tabs__nav').find('.control--active');
+
+    if (!$activeContent.length) {
+      $('.js-tabbed').find('.tabs__nav').find('li').eq(0).find('.js-tabbed-control').addClass('control--active');
+      $('.js-tabbed').find('.tabs__container').find('.js-tabbed-content').eq(0).addClass('content--active');
+    }
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.tabControls.on('click', function (event) {
+      event.preventDefault();
+      switchTabs(this);
+    });
+  };
+
+  var init = function init() {    
+  };
+  cacheDom();    
+  bindUIActions();
+  initTab();
+
+  //Tabbed.init = init;
+})(window.Tabbed = window.Tabbed || {}, jQuery);
+
+
+//Mobile Accordion
+(function (Expand, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.expandControls = $('.js-expand-control');
+  };
+
+  var resetExpands = function resetExpands($parent) {
+    $parent.find('.js-expand-control').removeClass('control--active');
+    $parent.find('.js-expand-content').removeClass('content--active');
+  };
+
+  var scrollToElement = function scrollToElement($element) {
+    var elementOffsetTop = $($element).offset().top;
+    if (elementOffsetTop < $(window).scrollTop()) {
+      // $('html, body').animate({
+      //   scrollTop: elementOffsetTop - 50
+      // }, 600);
+    }
+  };
+
+  var expandItem = function expandItem(element) {
+    var $self = $(element);
+    var $parent = $self.closest('.js-expand');
+    var $content = $self.siblings('.js-expand-content');
+
+    if ($content.length && !$content.hasClass('content--active')) {
+      resetExpands($parent);
+      $self.addClass('control--active');
+      $content.addClass('content--active');
+       scrollToElement($self[0]);
+    } else if ($content.length && $content.hasClass('content--active')) {
+      resetExpands($parent);
+    }
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $dom.expandControls.on('click', function () {
+      expandItem(this);
+    });
+  };
+
+  // var init = function init() {
+    
+  // };
+  cacheDom();
+  bindUIActions();
+
+  // Expand.init = init;
+})(window.Expand = window.Expand || {}, jQuery);
+
+(function (Toggle, $, undefined) {
+
+  Toggle.toggle = function (target) {
+    $(target).toggle();
+  };
+
+  var initRecoverPasswordForm = function initRecoverPasswordForm() {
+    if (window.location.hash === '#recover') {
+      Toggle.toggle('#customer-login-form, #recover-password-form');
+    }
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $('[data-toggle]').on('click', function (event) {
+      Toggle.toggle($(this).data('target'));
+    });
+
+    $('.js-dropdown').find('.dropdown-heading').on('click', function () {
+      $(this).toggleClass('is-active').next().slideToggle();
+    });
+  };
+
+  Toggle.init = function () {
+    bindUIActions();
+    initRecoverPasswordForm();
+  };
+}(window.Toggle = window.Toggle || {}, jQuery));
+
+//FAQ
+(function (Faqs, $) {  
+  
+    var $headers = $('.faq-container :header');
+    $headers.each(function(idx){
+      var $header = $(this);
+      $header.addClass('faq-item__header').attr('data-index', idx);
+      $header.nextUntil(':header').wrapAll('<div class="faq-item__content faq-item__content-' + idx + '"></div>');
+      $('.faq-item__content').hide();
+    });
+    
+    $headers.on('click', function(){
+      var $this = $(this);
+      if ($this.is('.active')) {
+        $('.faq-item__header').removeClass('active');
+        $('.faq-item__content').removeClass('active').slideUp();
+      } else {
+        $('.faq-item__header').removeClass('active');
+        $('.faq-item__content').removeClass('active').slideUp();
+        $this.addClass('active');
+        $('.faq-item__content-' + $this.data('index')).addClass('active').slideDown();
+      }
+    });  
+
+  //Faqs.init = init;
+})(window.Faqs = window.Faqs || {}, jQuery);
+
+//Sticky add to cart
+function showStickyAtc() {
+  var stickyBar  = $('.sticky-product'), //button that scrolls user to top
+      view = $(window),
+      timeoutKey = -2,
+      header = $('.header-sticky-wrapper'),
+      atc = $('.product__information .purchase-details');
+
+  console.log("Header height", header.css("height"));
+  console.log("ATC top", atc.position().top);
+
+  $(document).on('scroll', function() {
+    if(timeoutKey) {
+      window.clearTimeout(timeoutKey);
+      console.log("Clear stickyBar timeout");
+    }
+    timeoutKey = window.setTimeout(function(){
+
+      if (view.scrollTop() < atc.offset().top) {
+        if(stickyBar.hasClass("bottom"))
+        {
+
+          stickyBar.css("bottom", 0)
+        }else{
+          stickyBar.css("top", header.css("height"));
+        }    
+        console.log("Fade out stickyBar");
+        $("#chat-widget-container").css({'bottom': '0px'});
+        stickyBar.hide();
+      }
+      else {
+        console.log("Fade in stickyBar");
+        stickyBar.fadeIn();
+        if(stickyBar.hasClass("bottom"))
+        {
+
+          stickyBar.css("bottom", 0)
+        }else{
+          stickyBar.css("top", header.css("height"));
+        }   
+        if(stickyBar.hasClass("bottom"))
+        {
+          if ($('.dropdown.js-dropdown-insert').length > 0 ) {
+            // alert();
+            if($(window).width() < 600){
+              $("#chat-widget-container").css({'bottom': '109px'});
+              $("#btn-back-to-top.btt_left").css({'bottom': '125px'});
+            }
+            else{
+              $("#chat-widget-container").css({'bottom': '76px'});
+              $("#btn-back-to-top.btt_left").css({'bottom': '126px'});
+            }
+          }
+          else{
+            $("#chat-widget-container").css({'bottom': '76px'});
+            if($(window).width() < 980) {
+              $("#btn-back-to-top.btt_left").css({'bottom': '96px'});
+            }
+            else{
+              $("#btn-back-to-top.btt_left").css({'bottom': '126px'});
+            }
+
+          }
+        }
+      }
+    }, 100);
+  });
+}
+
+//call function on document ready
+$(function(){
+  if($('body').hasClass('product')){
+    showStickyAtc();
+  }
+});
+//Product
+(function (Product, $) {
+
+  var $dom = {};
+  var freeShippingAmount = void 0;
+
+  var cacheDom = function cacheDom() {
+    $dom.productForms = $(".js-product");
+    $dom.cartCount = $(".js-cart-count");
+    $dom.cartTotal = $(".js-cart-total");
+    $dom.modalItem = $(".js-atc-item");
+    $dom.modalQty = $(".js-atc-quantity");
+    $dom.modalPrice = $(".js-atc-price");
+    $dom.modalVariant = $(".js-atc-variant");
+    $dom.modalShipping = $(".js-atc-shipping");
+    $dom.modalSubtotal = $(".js-atc-subtotal");
+    $dom.productPrice = $(".product-hero__price-wrapper [data-price]");
+    $dom.productMemberPrice = $(".product-hero__price-wrapper [data-members-price]");
+  };
+
+  var setFreeShippingAmount = function setFreeShippingAmount() {
+    freeShippingAmount = {{ settings.cart_free_shipping_amount }} || 0;
+  };
+
+  var updateProductPrice = function updateProductPrice() {
+    //grab variant price and member price from dropdowns
+    var variantPrice = $(".js-dropdown :selected").attr("data-price");
+
+    if (variantPrice !== undefined) {
+      var variantMemberPrice = $(".js-dropdown :selected").attr("data-member-price").split(".");
+
+      //grab the current product price and member price and split them into an array in order to keep currency
+      var productPrice = $dom.productPrice.text().trim().split(" ").filter(Boolean);
+      var productMemberPrice = $dom.productMemberPrice.text().trim().split(" ").filter(Boolean);
+      productPrice[1] = '<span>' + productPrice[1] + '</span>';
+      productMemberPrice[1] = '<span>' + productMemberPrice[1] + '</span>';
+
+      //get the current product and member price and splice on the first index to replace the pricing with the one from the dropdown
+      var newProductPrice = productPrice.splice(0, 1, Shopify.formatMoney(variantPrice));
+      var newMemberPrice = productMemberPrice.splice(0, 1, Shopify.formatMoney(variantMemberPrice[0])).join(" ");
+
+      //take the array and join it for the new price in order to keep the correct currency
+      $dom.productPrice.html(productPrice.join(" "));
+      $dom.productMemberPrice.html(productMemberPrice.join(" "));
+    }
+  };
+
+  var updateCarousel = function updateCarousel() {
+    var variantImageAlt = $(".js-dropdown :selected").attr("data-image-alt");
+    var verticalSlideAlt = $(".product-vertical__carousel").find("[data-image-alt]");
+
+    verticalSlideAlt.each(function (i, el) {
+      var imageAlt = $(el).data("image-alt");
+      if (imageAlt === variantImageAlt) {
+        $(el).closest(".slick-slide").trigger("click");
+      }
+    });
+  };
+
+  var getQuantity = function getQuantity($product) {
+    var $quantity = $product.find(".js-quantity-input");
+    return $quantity.val();
+  };
+
+  var getVariantId = function getVariantId($product) {
+    var $variant = $product.find(".js-product-variant-id");
+    return $variant.attr('variant');
+  };
+
+  var getAdditionalItems = function getAdditionalItems($product) {
+    return $product.find(".js-addtocartwith-product-variant-id");
+  };
+
+  var updateItemTotals = function updateItemTotals() {
+    //var total = ${formatPrice(CartJS.cart.total_price)};
+    //var total =  Shopify.formatMoney(CartJS.cart.total_price) + window.PXUTheme.currency.iso_code;
+    var total =  formatPrice(CartJS.cart.total_price/100) + window.PXUTheme.currency.iso_code;
+    $dom.cartTotal.html(total);
+  };
+
+  var updateItemCount = function updateItemCount() {
+    var count = CartJS.cart.item_count;
+    if (count > 0) {
+      $dom.cartCount.addClass("header__cart-quantity--full");
+    } else {
+      $dom.cartCount.removeClass("header__cart-quantity--full");
+    }
+
+    if (count > 99) {
+      count = "99+";
+    }
+    $dom.cartCount.html(count);
+  };
+
+  var updateModalShipping = function updateModalShipping() {
+    var cartTotal = CartJS.cart.original_total_price;
+    if (cartTotal < freeShippingAmount) {
+      $dom.modalShipping.html("Add an extra " + Shopify.formatMoney(freeShippingAmount - cartTotal) + " for FREE shipping.");
+    } else {
+      $dom.modalShipping.empty();
+    }
+  };
+
+  function formatPrice(price) {
+    let formattedPrice;
+
+    if (window.PXUTheme.currency.display_format === 'money_with_currency_format') {
+      formattedPrice = `<span class="money">${window.PXUTheme.currency.symbol}${price}</span>`;
+    } else {
+      formattedPrice = `<span class="money">${window.PXUTheme.currency.symbol}${price}</span>`;
+    }
+
+    return formattedPrice;
+  }
+
+  var updateModalSubtotal = function updateModalSubtotal() {
+    var cartTotal = CartJS.cart.original_total_price;
+    //$dom.modalSubtotal.html(Shopify.formatMoney(cartTotal));
+    console.log(cartTotal);
+    console.log('data' , JSON.stringify(CartJS));    
+    $dom.modalSubtotal.html(formatPrice(cartTotal/100));
+    /* Update shipping indicator asynchronously js */
+    var amount_for_fs = $('.spend-shipping').attr('data-amt');
+    var total_price = cartTotal;
+    if(amount_for_fs > total_price){
+      //udpate
+      var amt_required_ffs = amount_for_fs - total_price;
+      var percent = total_price/amount_for_fs*100;
+      $('.free-shipping-indicator > div').css('width',percent+'%');
+      var indicator_msg = $('.indicator__msg').attr('data-msg');
+      indicator_msg = indicator_msg.replace('[[rem_amt]]',Shopify.formatMoney(amt_required_ffs));
+      $('.indicator__msg').html(indicator_msg);
+      $('.spend-shipping-wrap').show();
+    }else{
+      //remove shipping indicator
+      $('.spend-shipping-wrap').hide();
+    }
+  };
+
+  var displayATC = function displayATC(product) {
+    var productHandle = product.handle;
+    var productQty = product.quantity;
+    var productVariant = product.variant;
+    //var productPrice = Shopify.formatMoney(product.line_price);
+    var productPrice = formatPrice(product.line_price/100);
+    $.get("/products/" + productHandle + "?view=atc").done(function (html) {
+      $dom.modalItem.find(".js-atc-image, .js-atc-details").remove();
+      $dom.modalItem.prepend(html);
+      $dom.modalQty.html(productQty);
+      $dom.modalPrice.html(productPrice);
+      $dom.modalItem.find(".js-atc-variant").html($(".js-product-variant-id .select .single-option-selector").attr('data-variant-option-chosen-value'));
+      Modal.show("modal-atc");
+    });
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $(document).on("cart.requestComplete", function () {
+      updateItemCount();
+      updateItemTotals();
+      updateModalShipping();
+      updateModalSubtotal();
+    });
+
+    $("body").on("submit", ".js-product", function (event) {
+      event.preventDefault();
+      var $product = $(this);
+      var quantity = getQuantity($product);
+      var variant = getVariantId($product);
+      var selling = 711884897;
+      var additionalProducts = getAdditionalItems($product);      
+      CartJS.addItem(variant , quantity, {}, {
+        success: function success(data) {
+          displayATC(data);
+        },
+        error: function error(err) {
+          console.error(err);
+          window.alert("Please choose an option.");
+        }
+      });   
+      $.each(additionalProducts, function( index, item ) {
+        //console.log( index + ": " + value );
+        var variantId = $(item).val();
+        CartJS.addItem(variantId, quantity, {}, {
+          success: function success(data) {
+            console.log('Additional products added.');
+          },
+          error: function error(err) {
+            console.error(err);
+          }
+        });
+      });   
+    });
+    $(".js-dropdown").on("change", function () {
+      updateProductPrice();
+      updateCarousel();
+    });
+  };
+
+  // var init = function init(amount) {
+  // };
+      cacheDom();
+    setFreeShippingAmount();
+    bindUIActions();
+
+//     $('.product-hero__item-rating').on('click', function() {
+//       $('.tabs__nav').find("button[data-control-for='review']").trigger("click");
+//       setTimeout(function(){
+//             $([document.documentElement, document.body]).animate({
+//         scrollTop: $('.customer_review_tab').offset().top - 200
+//       }, 500);
+      
+//       }, 500);
+
+//     });
+//     $(".stamped-summary-actions-newquestion")[0].onclick = null;   
+//     $(".stamped-summary-actions-newreview")[0].onclick = null;
+
+    
+    $('.product-hero__learn-more').on('click', function(evt) {
+      evt.preventDefault();
+
+      $([document.documentElement, document.body]).animate({
+        scrollTop: $('.tabs').offset().top - 150
+      }, 500);
+    });
+
+  // Product.init = init;
+})(window.Product = window.Product || {}, jQuery);
+
+(function (CartPage, $) {
+  var updateCartSubtotal = function() {
+    setTimeout(function() {
+    var cartLineTotals = $('.cart__total .money').map(function() {
+      return parseInt($(this).text().replace(/\D/g, ''));
+    }).get();
+    
+    var total = 0;
+    for (var i = 0; i < cartLineTotals.length; i++) {      
+      total = total + cartLineTotals[i];
+    }
+
+    fetch('/cart.js')
+      .then(response => response.json())
+      .then(cart => {
+          // Update the displayed cart total
+          var carttotal = cart.total_price;
+         /* Update shipping indicator asynchronously js */
+    var amount_for_fs = $('.spend-shipping').attr('data-amt');
+    var total_price = carttotal;
+    if(amount_for_fs > total_price){
+      //udpate
+      var amt_required_ffs = amount_for_fs - total_price;
+      var percent = total_price/amount_for_fs*100;
+      $('.free-shipping-indicator > div').css('width',percent+'%');
+      var indicator_msg = $('.indicator__msg').attr('data-msg');
+      indicator_msg = indicator_msg.replace('[[rem_amt]]',Shopify.formatMoney(amt_required_ffs));
+      $('.indicator__msg').html(indicator_msg);
+      $('.spend-shipping-wrap').show();     
+       $('.shipping-subtotal').hide();
+    }else{
+      //remove shipping indicator
+      $('.spend-shipping-wrap').hide();
+      $('.shipping-subtotal').css('display','flex');
+    }
+      })
+    .catch(error => console.error('Error fetching cart:', error));
+      
+    $('.cart__subtotal-price').html(Shopify.formatMoney(total));
+   
+    }, 1500);  
+  };
+
+  var init = function init() {
+    // QuantitySelector.init();
+  };
+
+      $('.quantity-input').on('change.CartPage', function(){
+      // $('.qty-selector__input').off('.CartPage');
+//       $('.cart__update').show();
+      updateCartSubtotal();
+      console.log("here");
+    });
+
+    $('.qty-selector__dials').on('click.CartPage', function(){
+       $('.qty-selector__input').off('.CartPage');
+       $('.cart__update').show();
+      updateCartSubtotal();
+    });
+
+  //CartPage.init = init;
+})(window.CartPage = window.CartPage || {}, jQuery);
+
+$( document ).ready(function() {
+    var lp_optin = $.cookie("_xl_lp_optin");
+    if(lp_optin)
+    {
+      $('#chkJoinLoyalty').prop('checked', true); 
+      $('form#cart_form').append(
+        '<input type="hidden" name="discount" value="LOYALTYDISCOUNT" />',
+        '<input type="hidden" name="attributes[Loyalty Program]" value="lp-standard" />'
+      );
+      console.log("Already opted in to LP this session");
+    }      	
+});
+$('#chkJoinLoyalty').change(function() {
+    if(this.checked) {
+        console.log("Join Loyalty checked");
+        $('form#cart_form').append(
+            '<input type="hidden" name="discount" value="LOYALTYDISCOUNT" />',
+            '<input type="hidden" name="attributes[Loyalty Program]" value="lp-standard" />'
+        );
+        $.cookie("_xl_lp_optin", true);
+        //$(this).prop("checked", returnVal);
+    }else{
+      $('form#cart_form input[name="discount"]').remove();
+      $('form#cart_form input[name="attributes[Loyalty Program]"]').remove();
+      console.log("Join Loyalty unchecked");
+      $.removeCookie("_xl_lp_optin");
+    }              
+});
+//Live chat
+$(document).ready(function(){
+
+  $('a[href="#livechat"]').on('click', function(evt){
+    evt.preventDefault();
+    if (LC_API != undefined) {
+      LC_API.open_chat_window();
+    }
+  });
+});
+//Account Page
+(function (Accounts, $) {
+  var $dom = {};
+  var cacheDom = function cacheDom() {
+    $dom.nav = $('[data-account-nav]');
+    $dom.navBtn = $('[data-account-nav-btn]');
+    $dom.nav1 = $('[data-account-nav1]');
+    $dom.navBtn1 = $('[data-account-nav1-btn]');
+  };
+  var initAccounts = function initAccounts() {
+    // Toggle mobile account subnav
+    $dom.navBtn.on('click', function () {
+      if ($(window).width() < 768) {
+        $(this).toggleClass('open');
+        $dom.nav.toggle();
+      }
+    });
+    // Toggle mobile club subnav
+    $dom.navBtn1.on('click', function () {
+      if ($(window).width() < 768) {
+        $(this).toggleClass('open');
+        $dom.nav1.toggle();
+      }
+    });
+    // Replacement for link.active since we're using alternate templates
+    var location = window.location.pathname + window.location.search;
+    $dom.nav.find('a').each(function () {
+      $(this).toggleClass('active', $(this).attr('href') == location);
+	  	      $(this).parent('li').toggleClass('li-active', $(this).attr('href') == location);	
+	      	
+	      if (window.location.href.indexOf("order") > -1) {       	
+	        if($(this).is(':contains("My Orders")')) {	
+	          $(this).addClass('active');	
+	          $(this).parent('li').addClass('li-active');	
+	        }	
+	      }
+    });
+  };
+  cacheDom();
+  initAccounts();
+  // Accounts.init = function () {
+    
+  // };
+})(window.Accounts = window.Accounts || {}, jQuery);
+//Scroll Top
+function showButton() {
+  var button  = $('#btn-back-to-top'), //button that scrolls user to top
+      view = $(window),
+      timeoutKey = -1,
+      atc = $('.purchase-details .purchase-details__buttons');
+  if(atc.lenght){
+    $(document).on('scroll', function() {
+        if(timeoutKey) {
+            window.clearTimeout(timeoutKey);
+        }
+        timeoutKey = window.setTimeout(function(){
+
+            if (view.scrollTop() < atc.offset().top) {
+                button.fadeOut();
+            }
+            else {
+                button.fadeIn();
+            }
+        }, 100);
+    });
+  }
+}
+$('#btn-back-to-top').on('click', function(){
+  $('html, body').stop().animate({
+      scrollTop: 0
+  }, 500, 'linear');
+  return false;
+});
+$(function(){
+  showButton();
+});
+
+//our story popup
+$(document).ready(function() {
+  $('.plus_popup p, .expert_img').click(function(){
+    $('.overlay').show();
+    $(this).parents('.expert').find('.popuprofl_cnt').show();
+  });
+  $('.clsclick').click(function(){
+    $('.popuprofl_cnt').fadeOut(300);
+    $('.overlay').fadeOut(300);
+  });
+  $('.overlay').click(function(){
+    $('.popuprofl_cnt').fadeOut(300);
+    $('.overlay').fadeOut(300);
+  });
+});
+
+//Blog Page
+(function (BlogAccordions, $) {
+  
+  var init = function init() {
+  };  
+    var $headers = $('.blog__topics-link--has-children');
+    $headers.each(function(idx){
+      var $header = $(this);
+      $header.addClass('accordion__header expand__control').attr('data-index', idx);
+      $header.siblings().wrapAll('<div class="accordion__content accordion__content--' + idx + '"></div>');
+      $header.siblings().hide();
+    });
+    
+    $headers.on('click', function(evt){
+      evt.preventDefault();
+
+      var $this = $(this);
+      if ($this.is('.active')) {
+        $this.removeClass('active');
+        $this.siblings().removeClass('active').slideUp();
+      } else {
+        var $parent = $this.parents('.blog__topics-list');
+        $('.accordion__header', $parent).removeClass('active');
+        $('.accordion__content', $parent).removeClass('active').slideUp();
+        $this.addClass('active');
+        $this.siblings().addClass('active').slideDown();
+      }
+    });
+  
+
+  //BlogAccordions.init = init;
+})(window.BlogAccordions = window.BlogAccordions || {}, jQuery);
+
+// Product review
+(function (ReviewStars, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {};
+
+  var calculateStars = function calculateStars($product, rating) {
+
+    var avgScore = parseFloat(parseFloat(rating).toFixed(1));
+
+    if (avgScore !== undefined) {
+      var injectScore = '<span class="average-review">(' + avgScore + ') | </span>';
+
+      // Calculating half stars for total average star rating
+      var avgScoreInt = Math.floor(avgScore);
+      var totalScore = '<span class="start-wrap">';
+
+      //generates first 4 stars
+      for (var i = 0; i < 4; i++) {
+        if (avgScoreInt <= i) {
+          var avgScoreDec = avgScore % 1;
+          if (avgScoreDec < .5) {
+            totalScore += '<span class="spr-icon spr-icon-star-empty"></span>';
+          } else if (avgScoreDec > .5 && avgScoreDec < .99) {
+            totalScore += '<span class="spr-icon spr-icon-star-half-alt"></span>';
+          } else if (avgScoreDec > .99) {
+            totalScore += '<span class="spr-icon spr-icon-star"></span>';
+          }
+        } else {
+          totalScore += '<span class="spr-icon spr-icon-star"></span>';
+        }
+      }
+
+      //generates 5th star
+      if (avgScore === 5.0) {
+        totalScore += '<span class="spr-icon spr-icon-star"></span>';
+      } else if (avgScore > 3.9) {
+        var _avgScoreDec = avgScore % 1;
+        if (_avgScoreDec < .5) {
+          totalScore += '<span class="spr-icon spr-icon-star-empty"></span>';
+        } else if (_avgScoreDec > .5 && _avgScoreDec < .99) {
+          totalScore += '<span class="spr-icon spr-icon-star-half-alt"></span>';
+        } else if (_avgScoreDec > .99) {
+          totalScore += '<span class="spr-icon spr-icon-star"></span>';
+        }
+      } else {
+        totalScore += '<span class="spr-icon spr-icon-star-empty"></span>';
+      }
+
+      totalScore += '</span>';
+
+      $product.find('.spr-starrating.spr-badge-starrating').html(totalScore);
+      $product.find('.spr-badge-caption').prepend(injectScore);
+
+      if ($('.spr-starrating.spr-summary-starrating').length > 0) {
+        $('.spr-starrating.spr-summary-starrating').html(totalScore);
+        $('.spr-summary-caption').prepend(injectScore);
+      }
+    }
+  };
+
+  var addStars = function addStars() {
+    if ($('.product').length > 0) {
+      var findStars = setInterval(function () {
+        if ($('.product__information .spr-badge').length > 0) {
+          clearInterval(findStars);
+          var productRating = $('.product__information .spr-badge').data('rating');
+          var $product = $('.product__information .spr-badge');
+          calculateStars($product, productRating);
+
+          $('.product-hero__item-rating').find('.average-review').append('Based on ');
+        };
+      }, 500);
+    } else {
+      var _findStars = setInterval(function () {
+        if ($('.spr-badge').length > 0) {
+          clearInterval(_findStars);
+          $('.spr-badge').each(function (i, el) {
+            var productRating = $(el).data('rating');
+            var $product = $(el);
+            calculateStars($product, productRating);
+          });
+        }
+      }, 500);
+    };
+  };
+  var bindUIActions = function bindUIActions() {};
+
+  ReviewStars.init = function () {
+  };
+  cacheDom();
+  bindUIActions();
+  addStars();
+})(window.ReviewStars = window.ReviewStars || {}, jQuery);
+//Ingredients Blog
+(function (Ingredients, $) {
+
+  var $dom = {};
+
+  var cacheDom = function cacheDom() {
+    $dom.ingredients = $('.js-ingredient-card');
+  };
+
+  var buildProducts = function buildProducts() {
+    $dom.ingredients.each(function (index, ingredient) {
+      var $self = $(ingredient);
+      if ($self.hasClass('hide') === false) {
+        var handle = $self.attr('data-handle');
+        $.get('/blogs/' + handle + '?view=ajax-ingredient', function (data) {
+          $self.find('.js-ingredient-products').html(data);
+        });
+      }
+    });
+  };
+
+  var bindUIActions = function bindUIActions() {
+    $('body').on('letterFiltered', function () {
+      buildProducts();
+    });
+  };
+
+
+  cacheDom();
+    bindUIActions();
+    buildProducts();
+  // var init = function init() {
+    
+  // };
+
+  //Ingredients.init = init;
+})(window.Ingredients = window.Ingredients || {}, jQuery);
+
+//Ingredients Page Tabs
+function ingredients_tab() {
+  $('#template-page-ingredients .ingredint__buttons').each(function(){
+    var active, content, links = $(this).find('a');
+    active = links.first().addClass('active');
+    content = $(active.attr('href'));
+    links.not(':first').each(function () {
+      $($(this).attr('href')).hide();
+    });
+    $(this).find('a').click(function(e){
+      active.removeClass('active');
+      content.hide();
+      active = $(this);
+      content = $($(this).attr('href'));
+      active.addClass('active');
+      content.show();
+      return false;
+    });
+  });
+}
+$('.product-hero__item-rating').on('click',function(){
+  $('.tabs__nav').find("button[data-control-for='review']").trigger("click");
+    $('.js-tabs').css('padding-top', '133px');
+
+    setTimeout(function(){
+      $('html, body').animate({
+        scrollTop: $('.js-tabs').offset().top - 120
+      }, 500);
+    }, 500);
+});
+$(document).ready(function() {
+  ingredients_tab()
+}), $(document).on("shopify:section:select", function(e) {
+  ingredients_tab()
+}), $(document).on("shopify:section:deselect", function(e) {
+  ingredients_tab()
+});

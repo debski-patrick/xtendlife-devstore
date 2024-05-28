@@ -1,0 +1,242 @@
+<link rel="preload" href="{{ 'health-hub.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'health-hub.css' | asset_url }}">
+{% assign display_sublinks = false %}
+{%- if section.blocks.size > 0 -%}
+<div data-section-id="{{ section.id }}" data-section-type="health-hub">
+
+  <div class="health-hub-container">
+
+    <div class="section">
+      <div class="quote_section-header text-center">
+        <h2>{{ section.settings.header }}</h2>
+      </div>
+      <div class="container has-no-side-gutter">
+        {%- for block in section.blocks -%}
+        {% if block.type == 'First_row_item' %}
+        {%- if block.settings.image != blank -%}
+        {% assign width_column = section.settings.item_row_one %}
+        {% case width_column %}
+        {% when '6' %}
+         {% assign width ='one-half medium-down--one-whole' %}
+        {% when '4' %}
+         {% assign width ='one-third medium-down--one-whole' %}
+        {% else %}
+          {% assign width ='one-fourth medium-down--one-whole' %}
+        {% endcase %}
+        <div class="{{ width }}">
+          <a class="health-hub__block {% if block.settings.description == blank %} no-description {% endif %}" href="{{ block.settings.button_url }}">
+            <div style="padding-top:{{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100}}%;">
+              <img class="health-hub__image lazyload" data-src="{{ block.settings.image | img_url: '800x' }}"
+                   data-srcset="{{ block.settings.image | img_url: '800x' }} 1x,
+                                {{ block.settings.image | img_url: '800x', scale: 2 }} 2x"
+                   alt="{{ section.settings.header }}"
+                   data-image-alt="{{ section.settings.header }}">
+            </div>
+            {%- if block.settings.title != blank -%}
+            <div class="health-hub__info-block {% if block.settings.description != blank %} no-flex {% endif %}">
+              <div>
+                <div class="health-hub__title">{{ block.settings.title }}</div>
+                <div class="health-hub__description1">{{ block.settings.description }}</div>  
+              </div>
+              <div class="health-hub__subbutton">{%- include 'hp_right_arrow' -%}</div>                                 
+            </div>
+            {%- endif -%}
+          </a>
+        </div>
+       
+        {%- endif -%}
+        {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="container has-no-side-gutter health-hub__bottom-row">
+        {%- for block in section.blocks -%}
+        {% if block.type == 'Second_row_item' %}
+        {%- if block.settings.image != blank -%}
+        {% assign width_column = section.settings.item_row_second %}
+        {% case width_column %}
+        {% when '6' %}
+         {% assign width ='one-half medium-down--one-whole' %}
+        {% when '4' %}
+         {% assign width ='one-third medium-down--one-whole' %}
+        {% else %}
+          {% assign width ='one-fourth medium-down--one-whole' %}
+        {% endcase %}
+        <div class="{{ width }}">
+          <a class="health-hub__block {% if block.settings.description == blank %} no-description {% endif %}" href="{{ block.settings.button_url }}">
+            <div style="padding-top:{{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100}}%;">
+            <img class="health-hub__image lazyload" data-src="{{ block.settings.image | img_url: 'grande' }}"
+                 data-srcset="{{ block.settings.image | img_url: 'grande' }} 1x,
+                         {{ block.settings.image | img_url: 'grande', scale: 2 }} 2x"
+                 alt="{{ section.settings.header }}"
+                 data-image-alt="{{ section.settings.header }}">
+            </div>
+            {%- if block.settings.title != blank -%}
+            <div class="health-hub__info-block {% if block.settings.description != blank %} no-flex {% endif %}">
+              <div>
+                <div class="health-hub__title">{{ block.settings.title }}</div>
+                <div class="health-hub__description1">{{ block.settings.description }}</div>  
+              </div>
+                <div class="health-hub__subbutton">{%- include 'hp_right_arrow' -%}</div>                                  
+            </div>
+            {%- endif -%}
+          </a>
+        </div>
+        
+        {%- endif -%}
+        {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {% if section.settings.button_url != blank %}
+      <div class="health-hub__main-button">
+        <a href="{{ section.settings.button_url }}">{{ section.settings.button_text }}{%- include 'icon-right-arrow' -%}</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="health-hub__load">
+    <p class="button__read-more" data-hover="{{ section.settings.read_more_hover }}">{{ section.settings.read_more }}</p>
+  </div>
+</div>
+{%- endif -%}
+
+
+{% schema %}
+{
+  "name": "Health Hub",
+  "class": "health-hub",
+  "settings": [
+    {
+      "id": "header",
+      "type": "text",
+      "label": "Header",
+      "default": "Xtend Yourself with our Health Hub"
+    },
+    {
+      "type": "radio",
+      "id": "item_row_one",
+      "label": "Select the number of elements per first row",
+      "options": [
+        {
+          "value": "6",
+          "label": "Two"
+        },
+        {
+          "value": "4",
+          "label": "Three"
+        },
+        {
+          "value": "3",
+          "label": "Four"
+        }
+      ],
+      "default": "6",
+      "info": "You can change quantity item of firt Row"
+    },
+    {
+      "type": "radio",
+      "id": "item_row_second",
+      "label": "Select the number of elements per second row",
+      "options": [
+        {
+          "value": "6",
+          "label": "Two"
+        },
+        {
+          "value": "4",
+          "label": "Three"
+        },
+        {
+          "value": "3",
+          "label": "Four"
+        }
+      ],
+      "default": "4",
+      "info": "You can change quantity item of second Row"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Bottom Button header"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Bottom Button Url"
+    },
+    {
+      "type": "text",
+      "id": "read_more",
+      "label": "Read more button title",
+      "default": "See More Categories"
+
+    },
+    {
+      "type": "text",
+      "id": "read_more_hover",
+      "label": "Read more slide button title",
+      "default": "See Fewer Categories"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Item First Row",
+      "type": "First_row_item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Link for item"
+        }
+      ]
+    },
+    {
+      "name": "Item Second Row",
+      "type": "Second_row_item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Link for item"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "category": "Components",
+      "name": "Health Hub"
+    }
+  ]
+}
+{% endschema %}

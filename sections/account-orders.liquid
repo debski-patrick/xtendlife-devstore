@@ -1,0 +1,244 @@
+<!-- /templates/customers/account.liquid -->
+<link rel="preload" href="{{ 'account-pages.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'account-pages.css' | asset_url }}">
+
+<div class="account-logged-in-main account-top account-page section">
+<div class="container">
+  <section class="account-logged-in-left">
+    <div class="row-order">
+      <h2 class="account-nav-title account-nav-title--btn " data-account-nav-btn>{{ 'customer.account.details' | t }} {{ 'layout.customer.log_out' | t | customer_logout_link | replace: '<a', '<a class="small-down--hidden"'}}<span class="down_arrow_svg hide small-down--visible">{% include 'icon-right-arrow-new' %}</span></h2>
+        <nav class="account-logged-in-nav " data-account-nav>
+          <ul>
+            {% if linklists.my-account.links.size > 0 %}
+              {% for link in linklists.my-account.links %} 
+                <li class="account-nav-item">
+                  <a href="{{ link.url }}">{{ link.title }}{% if link.title contains 'Orders'%} ({% paginate customer.orders by 1000 %}{{ customer.orders.size }}{% endpaginate %}){% endif %}</a>
+                </li>
+              {% endfor %}
+            {% endif %} 
+             <li class="hide small-down--visible mobile_link_style">{{ 'layout.customer.log_out' | t | customer_logout_link }}</li>
+          </ul>
+        </nav>
+        {% include 'account-club-navigation' %}
+    </div>
+  </section>
+
+  <section class="account-logged-in-right">
+    <div class="row-order">
+      <div class="account-section">
+        <div class="account-logged-in-row my_order_page">
+          <header class="heading_titles">
+            <h1>{{section.settings.title}}</h1>
+          </header>
+
+          <div class="row">
+            <div class="{% if section.settings.enablefilter %}col-md-8{% else %}col-md-12{% endif %}">
+              <p>{{section.settings.message}}</p>
+            </div>
+			{% if section.settings.enablefilter %}
+            <div class="col-md-4">
+              {% paginate customer.orders by 1000 %}       
+              {% for order in customer.orders %}
+              {% assign order_date = order.created_at | date: "%Y" %}
+              {% assign new_order = order_date | append:',' | append: new_order %}        
+              {% endfor %}     
+              {% endpaginate %}
+              {% assign order_yearlist = new_order | split: ',' | uniq %}
+              <div class="select_oder_list">
+                <lable class="filter_order">Filter by:</lable>
+                <select class="order-list-dropdown">
+                  <option value="" selected="true" >All Orders</option>
+                  {% for orderlist in order_yearlist %}
+                  <option value="{{orderlist}}">{{orderlist}}</option>
+                  {% endfor %}
+                </select>
+
+                {% include 'icon-right-arrow-new' %}
+				<span class="save_year visibility"></span>
+              </div>
+            </div>
+			{% endif %}
+          </div>
+          {% if customer.orders.size < 1 %}
+          <p>You have placed no orders.</p>
+          {% else %}
+          
+          {% if customer.orders.size != 0 %}
+          {% include 'account-orders-table' %}
+          {% endif %}
+	{% comment %}
+          <nav class="pagination">
+            <ul class="pagination__list max-width-container">
+              {% assign paginate_index = 0 %}
+              {% if paginate.previous.is_link %}
+              <li class="pagination__item item--prev item--{{ paginate_index }}">
+                <a class="pagination__link link--prev link--arrow" href="{{ paginate.previous.url }}">
+                  {% include 'icon-left-arrow-new' %}
+                </a>
+              </li>
+              {% assign paginate_index = paginate_index | plus: 1 %}
+              {% endif %}
+
+              {% assign past_current = false %}
+              {% for part in paginate.parts %}
+              {% if part.is_link %}
+              <li class="pagination__item item--page item--{{ paginate_index }} item--other">
+                <a class="pagination__link" href="{{ part.url }}">{{ part.title }}</a>
+              </li>
+              {% else %}
+              <li class="pagination__item item--page item--{{ paginate_index }} {% if past_current %}item--other item--disabled{% else %}item--current{% endif %}">
+                <a class="pagination__link {% unless past_current %}link--current{% endunless %}">{{ part.title }}</a>
+              </li>
+              {% assign past_current = true %}
+              {% endif %}
+              {% assign paginate_index = paginate_index | plus: 1 %}
+              {% endfor %}
+
+              {% if paginate.next.is_link %}
+              <li class="pagination__item item--next item--{{ paginate_index }}">
+                <a class="pagination__link link--next link--arrow" href="{{ paginate.next.url }}">
+                  {% include 'icon-right-arrow-new' %}
+
+                </a>
+              </li>
+              {% assign paginate_index = paginate_index | plus: 1 %}
+              {% endif %}
+
+            </ul>
+          </nav>
+          {% endcomment %}
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+<script>
+ $(document).ready(function() {
+    var filteringBy="";
+  $('.order-list-dropdown').on('change', function(event){
+
+    // grab the variant title and make it the filter value
+    var filteringBy = $(this).val();
+
+    if(filteringBy == '') {
+      $('.paginated').find('.tr').show();
+    } 
+    $('.save_year').html(filteringBy);
+    $('table.paginated').trigger('repaginate');
+    $('.page-number').click();
+    
+    });
+$('table.paginated').each(function() {
+  var currentPage = 0;
+  var numPerPage = 5;
+  var $table = $(this);
+  var $pager = $('<div class="pager light-theme"></div>');
+  var $previous = $('<span class="prev">Prev</spnan>');
+  var $next = $('<span class="next">Next</spnan>');
+
+  $pager.insertAfter($table).find('span.page-number:first').addClass('current');
+
+  $table.bind('repaginate', function() {
+    $table.find('tbody tr').hide();
+
+    $filteredRows = $table.find('tbody tr').filter(function(i, tr) {
+      return $('.save_year').text() != "" ? $(tr).find("td").get().map(function(td) {
+        return $(td).text();
+      }).filter(function(td){
+      	return td.indexOf($('.save_year').text()) != -1; 
+      }).length > 0 : true;
+    });
+    $filteredRows.slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+
+    var numRows = $filteredRows.length;
+    var numPages = Math.ceil(numRows / numPerPage);
+		
+    $pager.find('.page-number, .prev, .next').remove();
+    for (var page = 0; page < numPages; page++) {
+      var $newPage = $('<span class="page-number"></span>').text(page + 1).bind('click', {
+        newPage: page
+      }, function(event) {
+        currentPage = event.data['newPage'];
+        $table.trigger('repaginate');
+      })
+      if(page == currentPage){
+      	$newPage.addClass('clickable current');
+     	}else{
+      	$newPage.addClass('clickable');
+      }
+      $newPage.appendTo($pager)
+    }
+    if(numPages <= 1){
+    $pager.addClass('visibility');
+    }
+    else{
+    $pager.removeClass('visibility');
+    }
+
+    $previous.insertBefore('span.page-number:first');
+  	$next.insertAfter('span.page-number:last');
+
+    $next.click(function(e) {
+      $previous.addClass('clickable');
+      $pager.find('.current').next('.page-number.clickable').click();
+    });
+    $previous.click(function(e) {
+      $next.addClass('clickable');
+      $pager.find('.current').prev('.page-number.clickable').click();
+    });
+
+    $next.addClass('clickable');
+    $previous.addClass('clickable');
+
+    setTimeout(function() {
+      var $active = $pager.find('.page-number.current');
+      if ($active.next('.page-number.clickable').length === 0) {
+        $next.removeClass('clickable');
+      } else if ($active.prev('.page-number.clickable').length === 0) {
+        $previous.removeClass('clickable');
+      }
+
+    });
+  });
+  if($('.save_year').text() == 'all') {
+    alert();
+    $('.paginated').find('.tr').show();
+  } 
+  $table.trigger('repaginate');
+});
+  });
+</script>
+
+
+{% schema %}
+  {
+    "name": "Account Orders",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "My Orders"
+      },
+      {
+        "type": "richtext",
+        "id": "message",
+        "label": "Message"
+      },
+	  {
+        "type": "checkbox",
+        "id": "enablefilter",
+        "label": "Enable order filter"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

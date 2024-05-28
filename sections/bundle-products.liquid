@@ -1,0 +1,106 @@
+<link rel="preload" href="{{ 'slick.css' | asset_url }}" as="style">
+<style>
+  #shopify-section-{{ section.id }} {
+    background: {{ section.settings.background_bg }};
+  }
+  </style>
+<div class="bundle block-{{section.id}}">
+  <div class="section">
+    <div class="bundle_header">
+      <h2>{{ section.settings.title }}</h2>
+    </div>
+    <div class="bundle_slider">
+      {% for block in section.blocks %}
+      {% if block.settings.image != blank %}
+      <div class="bundle_img">
+        <img src="{{ block.settings.image | img_url:"master"}}" alt="{{ block.settings.image.alt }}"/>
+        <div class="bundle_info">
+          <h3>{{ block.settings.title }}</h3>
+          <p>{{ block.settings.content }}</p>
+        </div>
+      </div>
+        {% else %}
+        {%- assign product = block.settings.featured_product -%}
+        <div class="bundle_img col-md-4">
+          {% render 'bundle_product-info',
+                  product: product,
+                  discount_offer: block.settings.title,
+                  content: block.settings.content
+            %}
+            </div>
+   
+      {% endif %}
+      {% endfor %}
+    </div>
+     <a class="bundle_tscs" href="{{ section.settings.bundle_tc_link }}">{{ section.settings.bundle_tc }}</a>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Bundle Products",
+    "settings": [
+       {
+    	  "type": "color",
+    	  "id": "background_bg",
+    	  "label": "Background Color"
+    	},
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "textarea",
+        "id": "bundle_tc",
+        "label": "Bundle terms and condition"
+      },
+      {
+        "type": "url",
+        "id": "bundle_tc_link",
+        "label": "Bundle terms and condition link"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Slide",
+        "settings": [
+          {
+            "type": "product",
+            "id": "featured_product",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+           },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Discount Offer"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Text"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Bundle Product",
+        "category": "Image",
+        "settings": {
+        }
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

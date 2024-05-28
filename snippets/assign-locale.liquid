@@ -1,0 +1,13 @@
+{%- case shop.permanent_domain -%}
+    {%- when 'xtend-uk.myshopify.com' -%}
+      {%- assign store_region = 'uk' -%}
+    {%- when 'xtend-nz.myshopify.com' -%}
+      {%- assign store_region = 'nz' -%}
+    {%- when 'xtend-au.myshopify.com' -%}
+      {%- assign store_region = 'au' -%}
+    {%- when 'xtenddev.myshopify.com' -%}
+      {%- assign store_region = 'dev' -%}
+    {%- else -%}
+      {%- assign store_region = 'us' -%}
+  {%- endcase -%}
+  

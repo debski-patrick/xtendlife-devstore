@@ -1,0 +1,71 @@
+{% unless request.url contains "apps/xtendlifeclub" %}
+	<link rel="stylesheet" href="{{ settings.xtendlife_integrator_url }}/content/shopify-dashboard.css" />
+  <link rel="stylesheet" href="{{ settings.xtendlife_integrator_url }}/content/skeleton-loader.css" />
+{% endunless %}
+<h2 class="account-nav-title account-nav-title--btn" data-account-nav1-btn>{{ 'customer.orders.loyalty_program' | t }} <span class="down_arrow_svg desktop_hide">{% include 'icon-right-arrow-new' %}</span></h2>
+<nav class="account-logged-in-nav" data-account-nav1>  
+  <ul>
+	{% if customer %}  
+    {% comment %}
+    <li class="account-nav-item"><a href="#">{{ request.path }}</a></li>
+    <li class="account-nav-item"><a href="#">{{ request.page_type }}</a></li>
+    <li class="account-nav-item"><a href="#">{{ template }}</a></li>
+    {% endcomment %}
+    <club-management id="menu" style="position: relative;">
+      <!--<div style="position: relative; width:100%;height:100px">
+        <div class="xl-loading"></div>
+        <li class="account-nav-item"><a href="#">Loading Xtend-Life Club Menu</a></li>
+      </div>-->
+      <li class="skeleton-vertical__nav-item"><div class="skeleton-vertical__nav-text skeleton-text"></div></li>    
+      <li class="skeleton-vertical__nav-item"><div class="skeleton-vertical__nav-text skeleton-text"></div></li>
+      <li class="skeleton-vertical__nav-item"><div class="skeleton-vertical__nav-text skeleton-text"></div></li>
+      <li class="skeleton-vertical__nav-item"><div class="skeleton-vertical__nav-text skeleton-text"></div></li>       
+    </club-management>
+    {% endif %}
+  </ul>
+</nav>
+{% unless template == "customers/account" %}
+	{% if template != blank %}
+    {% comment %} Get order count to parse to the lp script url below {% endcomment %}
+    {% assign order_count = 0 %} 
+    {% for order in customer.orders %}
+        {% assign filfillment_status = order.fulfillment_status | downcase %} 
+        {% if filfillment_status == "fulfilled" %}
+            {% assign order_count = order_count | plus: 1 %}
+        {% endif %}
+    {% endfor %}
+      <script>
+        {{ settings.xtendlife_integrator_url }}
+        var XLAccount;
+        (function (XLAccount) {
+            var Navigation = /** @class */ (function () {
+                function Navigation() {
+                    console.log("Account.Navigation created and email parsed was {{ customer.email }}");
+                    this.GetClubNavigation();
+                }
+                Navigation.prototype.GetClubNavigation = function () {
+                    var _this = this;
+                  var url = '{{ settings.xtendlife_integrator_url }}/xtendlifeclub/getclubaccountmenu?email={{ customer.email }}&sfyId={{ customer.id }}&sfySite={{shop.permanent_domain}}&orderCount={{order_count}}';
+                  $.get( url, function(response) {
+                    _this.clubContent = $(document.createElement('club-management')).append(response);
+                    _this.clubMenu = $(_this.clubContent).find("club-management-account-menu#menu");
+                    //console.log( response );
+                  })
+                  .done(function() {
+
+                  })
+                  .fail(function() {
+                      _this.clubContent.html('<div class="alert alert-danger">Your Loyalty Program Settings couldn&rsquo;t be retrieved.</div>');
+                  })
+                  .always(function(response) {
+                    $("club-management#menu").html(_this.clubMenu.html());
+                  });
+                };
+                return Navigation;
+            }());
+            XLAccount.Navigation = Navigation;
+        })(XLAccount || (XLAccount = {}));
+        window.XLAccountNavigation = new XLAccount.Navigation();
+      </script>
+	{% endif %}
+{% endunless %}

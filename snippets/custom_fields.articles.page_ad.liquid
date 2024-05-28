@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["page_ad"] != blank %}
+  <div class="custom-field custom-field__page-ad custom-field__type--page-reference">
+    <h3 class="custom-field--title">Page Ad</h3>
+    <div class="custom-field--value">  
+      {% assign page_ref = pages[article.metafields["custom_fields"]["page_ad"]] %}
+      {{ page_ref.title | link_to: page_ref.url }}
+    </div>
+  </div>
+{% endif %}

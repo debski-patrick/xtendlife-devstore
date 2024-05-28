@@ -1,0 +1,93 @@
+<link rel="preload" href="{{ 'slick.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'slick.css' | asset_url }}">
+<link rel="preload" href="{{ 'gallery-slider.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'gallery-slider.css' | asset_url }}">
+<style>
+  .manufacturing_image.block-{{section.id}} .slick-prev:before, .manufacturing_image.block-{{section.id}} .slick-next:before {
+    content: "";
+  }
+</style>
+<div class="manufacturing_image block-{{section.id}}">
+  <div class="section">
+   <div class="eight-tenths" style="margin: 0 auto;"> 
+    <div class="gallery_header col-md-12 col-xs-12">
+      <h2>{{ section.settings.title }}</h2>
+      <p>{{ section.settings.content }}</p>
+    </div>
+    <div class="gallery_slider">
+      {% for block in section.blocks %}
+      {% if block.settings.image != blank %}
+      <div class="gallery_img">
+        <img src="{{ block.settings.image | img_url:"master"}}" alt="{{ block.settings.image.alt }}"/>
+        <div class="gallery_info">
+          <h3>{{ block.settings.title }}</h3>
+          <span>{{ block.settings.quote }}</span>
+          <p>{{ block.settings.content }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+   </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Gallery Slider V1",
+    "class": "gallery-slider",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "richtext",
+        "id": "content",
+        "label": "Text"
+      } 
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Slide",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+           },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "quote",
+            "label": "Text"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Text"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Gallery Slider V1",
+        "category": "Image",
+        "settings": {
+        }
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

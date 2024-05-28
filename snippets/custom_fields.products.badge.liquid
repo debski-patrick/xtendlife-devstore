@@ -1,0 +1,9 @@
+{% if product.metafields["custom_fields"]["badge"] != blank %}
+  <div class="custom-field custom-field__badge custom-field__type--single-line-text-field">
+    <h3 class="custom-field--title">Badge</h3>
+    <div class="custom-field--value">
+      {{ product.metafields["custom_fields"]["badge"] }}
+
+    </div>
+  </div>
+{% endif %}

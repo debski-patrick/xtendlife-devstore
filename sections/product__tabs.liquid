@@ -1,0 +1,194 @@
+<section class="tabs js-tabs">
+  <div class="pro_tab_new">
+  <ul class="tabs__nav">
+    <li><button class="tabs__control js-tab-control" data-control-for="{{ section.settings.tab_label_1 | handleize}}">{{ section.settings.tab_label_1 }}</button></li>
+    {% if product.metafields.custom_fields.product_directions != blank %}
+    <li><button class="tabs__control js-tab-control" data-control-for="{{ section.settings.tab_label_2 | handleize}}">{{ section.settings.tab_label_2 }}</button></li>
+    {% endif %}
+    {% if product.metafields.custom_fields.product_ingredients != blank %}
+      {% assign tab_title = section.settings.tab_label_3 | remove: ' & Nutritional Information'  %}
+      <li><button class="tabs__control js-tab-control" data-control-for="{{ tab_title | handleize}}">{{ section.settings.tab_label_3 }}</button></li>
+    {% endif %}
+    {% if product.metafields.custom_fields.product_faqs != blank %}
+      <li><button class="tabs__control js-tab-control" data-control-for="{{ section.settings.tab_label_4 | handleize}}">{{ section.settings.tab_label_4 }}</button></li>
+    {% endif %}
+    {%- unless product.tags contains 'no-reviews-tab' -%}
+      {% assign tab_title = section.settings.tab_label_5 | remove: 'Customer '  %}
+      <li><button class="tabs__control js-tab-control" data-control-for="{{ tab_title | remove: 's' | handleize}}">{{ section.settings.tab_label_5 }}</button></li>
+    {%- endunless -%}
+
+  </ul>
+  </div>
+  <div class="tabs__content-container max-width-container">
+    <div class="  two-fifths js-expand">
+      <div class="expand__container tabs__content js-tab-content" data-content="{{ section.settings.tab_label_1 | handleize}}">
+        <button class="expand__control js-expand-control"><h2>{{ section.settings.tab_label_1 }}</h2></button>
+        <div class="expand__content js-expand-content text__layout">
+          <div class="product-description-wrapper">
+
+            {%- assign force_feature_icons = false -%}
+            {%- capture product_feature_icons %}
+              {%- if product.tags contains 'no-harsh-chemicals' or force_feature_icons -%}
+                {%- include 'icon-no-harsh-chemicals' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'natural-ingredients' or force_feature_icons -%}
+                {%- include 'icon-natural-ingredients' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'cruelty-free' or force_feature_icons -%}
+                {%- include 'icon-cruelty-free' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'soy-free' or force_feature_icons -%}
+                {%- include 'icon-soy-free' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'superior-quality' or force_feature_icons -%}
+                {%- include 'icon-superior-quality' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'clinically-proven' or force_feature_icons -%}
+                {%- include 'icon-clinically-proven' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'dermatologically-tested' or product.tags contains 'dermatalogically-tested' or force_feature_icons -%}
+                {%- include 'icon-dermatologically-tested' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'over-1200-reviews' or force_feature_icons -%}
+                {%- include 'icon-over-1200-reviews' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'no-added-sugar' or force_feature_icons -%}
+                {%- include 'icon-no-added-sugar' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'no-artificial-flavours' or force_feature_icons -%}
+                {%- include 'icon-no-artificial-flavours' -%}
+              {%- endif -%}
+              {%- if product.tags contains 'pure-ingredients' or force_feature_icons -%}
+                {%- include 'icon-pure-ingredients' -%}
+              {%- endif -%}
+            {% endcapture -%}
+
+            {%- if product_feature_icons != blank -%}
+              <div class="product-features">
+                <div class="product-features__title">
+                  Features & Benefits
+                </div>
+                <div class="product-features__icons">
+                  {{ product_feature_icons }}
+                </div>
+              </div>
+            {%- endif -%}
+
+            {%- assign product_description = product.description | split: '<!-- read more -->' -%}
+            <div class="product-description">
+            {{ product_description | first }}
+              {%- if product_description.size > 1 -%}
+                <div class="js-read-more read-more">
+                  {% for description in product_description offset: 1 %}
+                    {{ description }}
+                  {% endfor %}
+                </div>
+                <button type="button" class="button button--secondary js-read-more-button">Read More</button>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if product.metafields.custom_fields.product_directions %}
+      <div class="expand__container tabs__content js-tab-content" data-content="{{ section.settings.tab_label_2 | handleize}}">
+        <button class="expand__control js-expand-control"><h2>{{ section.settings.tab_label_2 }}</h2></button>
+        <div class="expand__content js-expand-content text__layout">{{ product.metafields.custom_fields.product_directions }}</div>
+      </div>
+    {% endif %}
+      {% if product.metafields.custom_fields.product_ingredients != blank %}
+        <div class="expand__container tabs__content js-tab-content" data-content="{{ section.settings.tab_label_3 | remove: " & Nutritional Information" | handleize}}">
+          <button class="expand__control js-expand-control"><h2>{{ section.settings.tab_label_3 |  remove: " & Nutritional Information" }}</h2></button>
+          <div class="expand__content js-expand-content text__layout">{{ product.metafields.custom_fields.product_ingredients }}</div>
+        </div>
+      {% endif %}
+
+      {% if product.metafields.custom_fields.product_faqs %}
+        <div class="expand__container tabs__content js-tab-content" data-content="{{ section.settings.tab_label_4 | handleize}}">
+          <button class="expand__control js-expand-control"><h2>{{ section.settings.tab_label_4 }}</h2></button>
+          <div class="expand__content js-expand-content text__layout faq-container">{{ product.metafields.custom_fields.product_faqs }}</div>
+        </div>
+      {% endif %}
+
+      {%- unless product.tags contains 'no-reviews-tab' -%}
+        {% assign tab_title = section.settings.tab_label_5 | remove: 'Customer '  %}
+        <div class="expand__container tabs__content js-tab-content customer_review_tab" data-content="{{ tab_title | remove: 's' | handleize}}">
+          <button class="expand__control js-expand-control"><h2>{{ section.settings.tab_label_5 }}</h2></button>
+          <div class="expand__content js-expand-content text__layout">
+            {% if settings.stamped_product_reviews %}
+            	<!--/ Stamped.io integration -->
+                <div id="stamped-main-widget" 
+                  data-widget-style="standard"
+                  data-product-id="{{ product.id }}" 
+                  data-name="{{ product.title | escape }}" 
+                  data-url="{{ shop.url }}{{ product.url }}" 
+                  data-image-url="{{ product.featured_image | product_img_url: "large" |replace: '?', '%3F' | replace: '&','%26'}}" 
+                  data-description="{{ product.description | escape }}" 
+                  data-product-sku="{{product.handle}}"
+                  data-product-type="{{product.type}}"> 
+                  {{ product.metafields.stamped.reviews }} 
+                </div>
+            {% else %}
+                <!--/ Shopify reviews integration -->
+                <div id="shopify-product-reviews" data-id="{{product.id}}">
+                	{{ product.metafields.spr.reviews }}
+            	</div>
+            {% endif %} 
+          </div>
+        </div>
+      {%- endunless -%}
+
+    </div>
+  </div>
+</section>
+{% schema %}
+  {
+    "name": "Product Tabs",
+	"class": "product-template",
+	"templates": [
+    "product"
+  	],
+    "settings": [
+	  {
+		"type": "text",
+		"id": "tab_label_1",
+		"label": "Tab title",
+		"default": "Description"
+	  },
+	  {
+		"type": "text",
+		"id": "tab_label_2",
+		"label": "Tab title",
+		"default": "Directions"
+	  },
+	  {
+		"type": "text",
+		"id": "tab_label_3",
+		"label": "Tab title",
+		"default": "Ingredients & Nutritional Information"
+	  },
+	  {
+		"type": "text",
+		"id": "tab_label_4",
+		"label": "Tab title",
+		"default": "FAQ"
+	  },
+	  {
+		"type": "text",
+		"id": "tab_label_5",
+		"label": "Tab title",
+		"default": "Customer Reviews"
+	  }
+	],
+    "default": {
+      "settings": {
+
+      }
+    }
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

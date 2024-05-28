@@ -1,0 +1,19 @@
+{% if collection.metafields["custom"]["collection_main_banner_desktop"] != blank %}
+  <div class="custom-field custom-field__collection-main-banner-desktop custom-field__type--file-reference">
+    <h3 class="custom-field--title">Collection Main Banner Desktop</h3>
+    <div class="custom-field--value">
+      {% assign type = collection.metafields["custom"]["collection_main_banner_desktop"].value.media_type %}
+      {% case type %}
+        {% when "image" %}
+          {{ collection.metafields["custom"]["collection_main_banner_desktop"].value | image_url: width: 500 | image_tag }}
+        {% when "video" %}
+          {{ collection.metafields["custom"]["collection_main_banner_desktop"].value | video_tag: image_size: "500x", width: 500, autoplay: false, controls: true }}
+        {% else %}
+          {% assign file_url = collection.metafields["custom"]["collection_main_banner_desktop"].value.url %}
+          <a target="_blank" href="{{ file_url }}">{{ collection.metafields["custom"]["collection_main_banner_desktop"] | media_tag: image_size: "200x" }}</a>
+          <div>{{ file_url | split: '/' | last | split: '?v=' | first }}</div>
+      {% endcase %}
+
+    </div>
+  </div>
+{% endif %}

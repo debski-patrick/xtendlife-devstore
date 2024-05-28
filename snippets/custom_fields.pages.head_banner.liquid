@@ -1,0 +1,33 @@
+{% if page.metafields["custom_fields"]["head_banner"] != blank %}
+<div class="cf-widget-head-banner cf-widget__text-bg-image">
+  <div class="cf-widget-items-wrapper">
+    {% for item in page.metafields["custom_fields"]["head_banner"] %}
+    <div class="cf-widget-item {% if item.light_text == 1 %}cf-light-text{% endif %} {% if item.left_align_text == 1 %}cf-text-left-align{% endif %} {% if item.fixed_position == 1 %}cf-fixed-position{% endif %} cf-height--{{ item.height }}" style="background-image:url('{% render "cf-image" with image: item.background_image, print: "url" %}')">
+      <div class="inner">
+        <div class="inner-padding">
+          
+            {% if item.title != blank %}
+            <div class="cf-widget-field cf-widget-field__title cf-widget-field--text">
+              {{ item.title }}
+            </div>
+            {% endif %}
+          
+            {% if item.body != blank %}
+            <div class="cf-widget-field cf-widget-field__body cf-widget-field--html">
+              {{ item.body }}
+            </div>
+            {% endif %}
+          
+            {% if item.link != blank %}
+            <div class="cf-widget-field cf-widget-field__link cf-widget-field--link">
+              {{ item.link }}
+            </div>
+            {% endif %}
+          
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

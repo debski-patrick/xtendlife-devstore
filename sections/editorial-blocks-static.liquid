@@ -1,0 +1,232 @@
+<section class="section is-width-standard">
+    <div class="container">
+    <div class="editorial-container">
+      {% for block in section.blocks %}
+        <div class="editorial-row">
+          {% for i in (1..3) %}
+            {% assign enabled_setting = 'block_enabled_' | append: i %}
+            {% if block.settings[enabled_setting] %}
+              {% assign url_setting = 'block_url_' | append: i %}
+              {% assign image_setting = 'block_image_' | append: i %}
+              {% assign heading_setting = 'block_heading_' | append: i %}
+              {% assign subcopy_setting =  'block_subcopy_' | append: i%}
+              {% assign cta_setting = 'block_cta_' | append: i %}
+              {% assign horizontal_setting = 'block_horizontal_' | append: i %}
+              {% assign vertical_setting = 'block_vertical_' | append: i %}
+    
+              <a class="editorial-block" href="{{ block.settings[url_setting] }}" style="background-image: url({{ block.settings[image_setting] | img_url: '767x', scale: 2, crop: 'center' }});">
+    
+                <img class="editorial-block--image" src="{{ block.settings[image_setting] | img_url: '767x', scale: 2, crop: 'center' }}" alt="{{ block.settings[heading_setting] }}">
+    
+                <div class="editorial-block--inner block-horizontal--{{ block.settings[horizontal_setting] }} block-vertical--{{ block.settings[vertical_setting] }}">
+                  <h4 class="editorial-block--heading"><span>{{ block.settings[heading_setting] }}</span></h4>
+    
+                  <div class="editorial-block--subcopy-container">
+                    {% if block.settings[subcopy_setting] != '' %}
+                    <span class="editorial-block--subcopy">{{ block.settings[subcopy_setting] }}</span>  
+                    {% endif %}
+                    {% if block.settings[cta_setting] != '' %}
+                    <strong class="button button--primary editorial-block--cta"><span>{{ block.settings[cta_setting] }}</span></strong>  
+                    {% endif %}
+                  </div><!-- .editorial-block--subcopy-container -->
+                </div><!-- .editorial-block--inner -->
+              </a><!-- .editorial-block -->
+            {% endif %}
+          {% endfor %}
+        </div><!-- .editorial-row -->
+      {% endfor %}
+    </div><!-- .editorial-container -->
+      </div>
+    </section>
+    {% schema %}
+      {
+        "name": "Editorial Content",
+        "blocks": [
+          {
+            "type": "row",
+            "name": "Row",
+            "settings": [
+              {
+                "type": "header",
+                "content": "Block 1"
+              },
+              {
+                "id": "block_enabled_1",
+                "type": "checkbox",
+                "label": "Enabled",
+                "default": true
+              },
+              {
+                "id": "block_url_1",
+                "type": "text",
+                "label": "URL"
+              },
+              {
+                "id": "block_image_1",
+                "type": "image_picker",
+                "label": "Image"
+              },
+              {
+                "id": "block_heading_1",
+                "type": "text",
+                "label": "Heading Text"
+              },
+              {
+                "id": "block_subcopy_1",
+                "type": "text",
+                "label": "Sub Copy"
+              },
+              {
+                "id": "block_cta_1",
+                "type": "text",
+                "label": "CTA Text"
+              },
+              {
+                "id": "block_horizontal_1",
+                "type": "radio",
+                "label": "Horizontal Position (Mobile)",
+                "options": [
+                  { "value": "left", "label": "Left" },
+                  { "value": "center", "label": "Center" },
+                  { "value": "right", "label": "Right" }
+                ],
+                "default": "center"
+              },
+              {
+                "id": "block_vertical_1",
+                "type": "radio",
+                "label": "Vertical Position (Mobile)",
+                "options": [
+                  { "value": "top", "label": "Top" },
+                  { "value": "middle", "label": "Middle" },
+                  { "value": "bottom", "label": "Bottom" }
+                ],
+                "default": "middle"
+              },
+              
+              {
+                "type": "header",
+                "content": "Block 2"
+              },
+              {
+                "id": "block_enabled_2",
+                "type": "checkbox",
+                "label": "Enabled",
+                "default": true
+              },
+              {
+                "id": "block_url_2",
+                "type": "text",
+                "label": "URL"
+              },
+              {
+                "id": "block_image_2",
+                "type": "image_picker",
+                "label": "Image"
+              },
+              {
+                "id": "block_heading_2",
+                "type": "text",
+                "label": "Heading Text"
+              },
+              {
+                "id": "block_subcopy_2",
+                "type": "text",
+                "label": "Sub Copy"
+              },
+              {
+                "id": "block_cta_2",
+                "type": "text",
+                "label": "CTA Text"
+              },
+              {
+                "id": "block_horizontal_2",
+                "type": "radio",
+                "label": "Horizontal Position (Mobile)",
+                "options": [
+                  { "value": "left", "label": "Left" },
+                  { "value": "center", "label": "Center" },
+                  { "value": "right", "label": "Right" }
+                ],
+                "default": "center"
+              },
+              {
+                "id": "block_vertical_2",
+                "type": "radio",
+                "label": "Vertical Position (Mobile)",
+                "options": [
+                  { "value": "top", "label": "Top" },
+                  { "value": "middle", "label": "Middle" },
+                  { "value": "bottom", "label": "Bottom" }
+                ],
+                "default": "middle"
+              },
+              
+              {
+                "type": "header",
+                "content": "Block 3"
+              },
+              {
+                "id": "block_enabled_3",
+                "type": "checkbox",
+                "label": "Enabled",
+                "default": true
+              },
+              {
+                "id": "block_url_3",
+                "type": "text",
+                "label": "URL"
+              },
+              {
+                "id": "block_image_3",
+                "type": "image_picker",
+                "label": "Image"
+              },
+              {
+                "id": "block_heading_3",
+                "type": "text",
+                "label": "Heading Text"
+              },
+              {
+                "id": "block_subcopy_3",
+                "type": "text",
+                "label": "Sub Copy"
+              },
+              {
+                "id": "block_cta_3",
+                "type": "text",
+                "label": "CTA Text"
+              },
+              {
+                "id": "block_horizontal_3",
+                "type": "radio",
+                "label": "Horizontal Position (Mobile)",
+                "options": [
+                  { "value": "left", "label": "Left" },
+                  { "value": "center", "label": "Center" },
+                  { "value": "right", "label": "Right" }
+                ],
+                "default": "center"
+              },
+              {
+                "id": "block_vertical_3",
+                "type": "radio",
+                "label": "Vertical Position (Mobile)",
+                "options": [
+                  { "value": "top", "label": "Top" },
+                  { "value": "middle", "label": "Middle" },
+                  { "value": "bottom", "label": "Bottom" }
+                ],
+                "default": "middle"
+              }
+            ]
+          }
+        ],
+        "presets":[
+          {
+            "category":"Text",
+            "name":"Editorial blocks"
+          }
+        ]
+      }
+    {% endschema %}

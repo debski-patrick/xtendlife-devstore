@@ -1,0 +1,254 @@
+<script>
+    Shopify = window.Shopify || {};
+    Shopify.Checkout = Shopify.Checkout || {};
+    Shopify.Checkout.items = [];
+    {% for line_item in checkout.line_items %}     	 
+        var item = {
+          id: {{ line_item.product_id }},
+          variant_id: "{{ line_item.variant_id }}",
+          sku: "{{ line_item.sku }}",
+          title: "{{ line_item.product.title }}",
+          quantity: {{ line_item.quantity }}
+        }
+        Shopify.Checkout.items.push(item);
+    {% endfor %} 
+    
+    (function (Checkout_Elements, Checkout, $) {  
+      var $dom = {};
+      var cacheDom = function cacheDom() {
+          $dom.loginLink = $('a[data-trekkie-id="have_an_account_login_link"]');
+      };
+      var updateLoginToButton = function buildUrl() {
+          console.log("Checkout_Elements.updateLoginToButton hit");
+          if(Checkout.step === 'contact_information'){
+              console.log("Checkout_Elements.updateLoginToButton Checkout.step is contact_information");
+              $dom.loginLink.addClass('btn btn--size-small');
+          }       
+      }; 
+      var init = function init() {
+          cacheDom();
+          updateLoginToButton();
+      };  
+      Checkout_Elements.init = init;
+    })(window.Checkout_Elements = window.Checkout_Elements || {}, window.Shopify.Checkout, window.jQuery || window.Checkout.$);
+    Checkout_Elements.init();
+    
+    (function (Checkout_PaymentOptions, Checkout, $) {  
+      var $dom = {};
+      var cacheDom = function cacheDom() {
+          $dom.seperator = $('.alternative-payment-separator').last();
+          $dom.stdPayments = $('.dynamic-checkout.dynamic-checkout__standard-payment-methods');
+          $dom.altPayments = $('[data-alternative-payments]');
+      };
+      var showPaymentOptions = function buildUrl() {
+          console.log("Checkout_PaymentOptions.showPaymentOptions hit");
+          if(Checkout.step === 'contact_information'){
+              console.log("Checkout_PaymentOptions.showPaymentOptions Checkout.step is contact_information");
+              if($dom.altPayments.children().length > 0){
+                  console.log("Checkout_PaymentOptions.showPaymentOptions alt payments are displayed");
+                  $dom.seperator.attr( "style", "display:flex !important;" );
+                  $dom.stdPayments.css('display', 'block');
+              }
+          }       
+      }; 
+      var init = function init() {
+            cacheDom();
+          showPaymentOptions();
+      };  
+      Checkout_PaymentOptions.init = init;
+    })(window.Checkout_PaymentOptions = window.Checkout_PaymentOptions || {}, window.Shopify.Checkout, window.jQuery || window.Checkout.$);
+    
+      //Change payment method name
+      (function (Checkout_PaymentMethods, Checkout, $) {  
+        var $dom = {};
+        var cacheDom = function cacheDom() {
+          $dom.paymentLabels = $('.radio__label__primary.content-box__emphasis');
+        };
+        var updatePaymentMethodNames = function updateNames() {
+          $dom.paymentLabels.each(function(i, obj) {
+              console.log($(this).text());
+              if($(this).text().indexOf('Windcave') > -1){
+                  console.log('Is Windcave Payments');
+                  $(this).text('Credit Card')
+                  return false;
+              }
+          });     
+        }; 
+        var init = function init() {
+            cacheDom();
+            updatePaymentMethodNames();
+        };  
+        Checkout_PaymentMethods.init = init;
+      })(window.Checkout_PaymentMethods = window.Checkout_PaymentMethods || {}, window.Shopify.Checkout, window.jQuery || window.Checkout.$);
+      Checkout_PaymentMethods.init();
+  </script>
+  <!---- Restricted Products KR ---->
+<script>
+  document.getElementById('checkout_shipping_address_country').addEventListener('change', function() {
+        selected_country_static = 'South Korea'
+        selected_country = this.value;
+        if(selected_country_static.indexOf(selected_country) !== -1){
+         const product_list = document.getElementsByClassName("product"); 
+          product_ids = '{{ settings.restricted_products_kr }}';
+          for(let i=0; i < product_list.length; i++) {
+           product_id = product_list[i].dataset.productId;
+            if(product_ids.indexOf(product_id) !== -1){
+              document.getElementsByClassName("step__footer__continue-btn")[0].style.display = "none"; 
+              document.getElementsByClassName("korea_poup")[0].style.display = "block"; 
+            }
+          }
+        }
+    });
+      window.addEventListener("load", (event) => {
+        selected_country_static = 'South Korea'
+        selected_country = document.getElementById('checkout_shipping_address_country').value;
+        if(selected_country_static.indexOf(selected_country) !== -1){
+         const product_list = document.getElementsByClassName("product"); 
+          product_ids = '{{ settings.restricted_products_kr }}';
+          for(let i=0; i < product_list.length; i++) {
+           product_id = product_list[i].dataset.productId;
+            if(product_ids.indexOf(product_id) !== -1){
+              document.getElementsByClassName("step__footer__continue-btn")[0].style.display = "none"; 
+              document.getElementsByClassName("korea_poup")[0].style.display = "block"; 
+            }
+          }
+        }
+    });
+      function myClosePopup() {
+    document.getElementsByClassName("korea_poup")[0].style.display = "none";
+}
+</script>
+  <!---- country redirect code---->
+  <script>
+      (function (Checkout_shipping_Options, $) {
+      var bind = function bind() {
+        var shipping_method = $('.section--shipping-method').html();
+        if (shipping_method === "undefined") {      
+        }else{
+          setTimeout(function(){
+            if( $('.section__content').find('.content-box__row').eq(0).find('input').is(':checked') ){          
+              var str1 = $('address').text();
+              //var shipping_price = $('.section__content').find('.content-box__row').eq(0).find('.content-box__emphasis').text();
+              var str2 = $('.section__content').find('.content-box__row').eq(0).find('.radio__label__primary').text(); 
+              if (str1.indexOf('Canada') > -1 && str2.indexOf('DHL Express Courier - Canada') > -1){
+                $('.shipping_poup').fadeIn(300);
+              }
+            }
+          }, 1000);
+          $('.input-radio').click(function() {        
+            var str1 = $('address').text();
+            //var shipping_price = $(this).parents('.content-box__row').find('.content-box__emphasis').text();
+            var str2 = $(this).parents('.content-box__row').find('.radio__label__primary').text();
+            if (str1.indexOf('Canada') > -1 && str2.indexOf('DHL Express Courier - Canada') > -1){
+              $('.shipping_poup').fadeIn(300);
+            }else{
+              $('.shipping_poup').fadeOut(300);
+            }
+          });
+          $('.shipping_cls a').on('click', function(){
+            $('.shipping_poup').fadeOut(300);        
+          });     
+        }   
+      }
+      var init = function init() {
+        bind();
+      };  
+    Checkout_shipping_Options.init = init;
+    })(window.Checkout_shipping_Options = window.Checkout_shipping_Options || {}, window.jQuery || window.Checkout.$);
+    Checkout_shipping_Options.init();
+  
+    (function (Checkout_Country_Options, $) {  
+      var bind = function bind() {
+        $('.edit_checkout').find('.section--shipping-address .fieldset .address-fields div[data-address-field="phone"]').before("<div class='field find_country'><a href='JavaScript:void(0)'>Can't find your country</a><svg class='icon-svg icon-svg--color-adaptive-lighter icon-svg--size-16 icon-svg--block icon-svg--center' role='presentation' aria-hidden='true' focusable='false'> <use xlink:href='#question'></use> </svg></div>");
+        $('.find_country').click(function(){
+          $('.overlay').fadeIn(300);
+          $('.country_poup').fadeIn(300);
+        });
+        $('.country_cls a').on('click', function(){
+          $('.country_poup').fadeOut(300);
+          $('.overlay').fadeOut(300);
+        });
+        $('.country_cnt ul li a').on('click', function(e){		  
+          var cookieval = $(this).parent('li').data('value').trim();		  
+          cookieval = cookieval.replace(' ', '-').toUpperCase();
+          console.log('Country redirect selected: ' + cookieval);
+          createCookie("user-location" ,cookieval,1);
+          return true;
+        });
+        // Shipping message print for EU countries 
+        $(".field.find_country").before('<div class="Country_alert"></div>');
+      var cars = ["Austria", "Belgium", "Bulgaria","Cyprus", "Croatia", "Republic of Cyprus", "Czech Republic", "Denmark",
+          "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland", "Italy", "Latvia",
+          "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"]
+          $("#checkout_shipping_address_country").change(function() {
+            var singleValues = $(this).find('option:selected').val();
+            var abc = ($.inArray( singleValues , cars ));
+            if ((cars).indexOf(singleValues) != -1) {
+              $(".Country_alert").html('<div class="field duties_message alert alert-warning" style="font-weight: bold;color: black;"><strong><em>NB: Your order maybe subject to VAT and/or other duties. All additional charges are the responsibility of the purchaser.</em></strong></div>');
+            }
+        else{
+         $(".duties_message").remove();
+        }
+      });
+      var singleValues = $("#checkout_shipping_address_country").find('option:selected').val();
+      var abc = ($.inArray( singleValues , cars ));
+      if ((cars).indexOf(singleValues) != -1) {
+        $(".Country_alert").html('<div class="field duties_message alert alert-warning" style="font-weight: bold;color: black;"><strong><em>NB: Your order maybe subject to VAT and/or other duties. All additional charges are the responsibility of the purchaser.</em></strong></div>');
+      }
+      else{
+        $(".duties_message").remove();
+      }
+      };
+      var getCookie = function getCookie(cname) {
+          var name = cname + "=";
+          var ca = document.cookie.split(";");
+          for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == " ") c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+          }
+          return "";
+        };
+        var createCookie = function createCookie(name, value, days) {
+          if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toGMTString();
+          } else var expires = "";
+          document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/;domain=.xtend-life.com";
+        };
+      var init = function init() {
+        bind();
+      };  
+      Checkout_Country_Options.init = init;
+    })(window.Checkout_Country_Options = window.Checkout_Country_Options || {}, window.jQuery || window.Checkout.$);
+    Checkout_Country_Options.init();
+  
+    // Loyalty Program Standard
+  (function (Checkout_LPStandard, Checkout, $) {  
+    var $dom = {};
+    var cacheDom = function cacheDom() {
+    };
+  
+    var cleanupStorage = function buildUrl() {
+      console.log("Checkout_LPStandard.cleanupStorage hit");
+      if(Checkout.step === 'thank_you'){
+        console.log("Checkout_LPStandard.cleanupStorage Checkout.step is thank_you");
+        var d = new Date;
+        d.setTime(d.getTime() + 24*60*60*1000*-1);
+        document.cookie = "_xl_lp_optin='';path=/;expires=" + d.toGMTString();
+      }       
+    }; 
+    var init = function init() {
+        cacheDom();
+        cleanupStorage();
+    };  
+    Checkout_LPStandard.init = init;
+  })(window.Checkout_LPStandard = window.Checkout_LPStandard || {}, window.Shopify.Checkout, window.jQuery || window.Checkout.$);
+  Checkout_LPStandard.init();
+  </script>
+  {% if settings.feature_norton_enabled %}
+  <!-- Start Norton BuySafe code -->
+  <script type="text/javascript" src="//guarantee-cdn.com/Web/Seal/gjs.aspx?SN={{settings.feature_norton_serial_number}}"></script>
+  <!-- End Norton BuySafe code -->
+  {% endif %}

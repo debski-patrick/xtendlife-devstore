@@ -1,0 +1,32 @@
+      {% if product.metafields.custom_fields.product_faqs != blank and section.settings.title != blank %}
+        <div class="expand__container tabs__content js-tab-content section is-width-standard" data-content="faq">
+          <h2 class="text-center faq_title">{{ section.settings.title }}</h2>
+          <div class="js-expand-content text__layout faq-container">{{ product.metafields.custom_fields.product_faqs }}</div>
+        </div>
+      {% endif %}
+      
+{% schema %}
+  {
+    "name": "FAQ Section",
+    "settings": [
+      {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "FAQ"
+      }
+    ],
+    "presets": [
+    {
+      "name": "FAQ PDP",
+      "category": "Text"
+    }
+  ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

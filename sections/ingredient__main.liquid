@@ -1,0 +1,167 @@
+<link rel="preload" href="{{ 'slick.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'slick.css' | asset_url }}">
+<link rel="preload" href="{{ 'article-ingredient.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'article-ingredient.css' | asset_url }}">
+
+
+{%- assign related_products_string = '' -%}
+{%- for tag in article.tags -%}
+	{%- if tag contains 'related-product::' -%}
+		{%- assign related_product = tag | remove: 'related-product::' -%}
+		{%- assign related_products_string = related_products_string | append: '|' | append: related_product -%}
+	{%- endif -%}
+{%- endfor -%}
+{%- assign related_products = related_products_string | remove_first: '|' | split: '|' -%}
+<div class="section ingredient__text-layout">
+  <div class="back_blog">
+        <div class="blog_title two-fifths medium-down--eight small-down--sixteen">
+                            {%- assign blog_handle = article.url -%}
+                  {%- if blog_handle contains 'supplement-ingredients' -%}
+                  {%- assign article_title = 'Health Benefits And Uses Of ' -%}
+                  {%- elsif blog_handle contains 'skincare-ingredients' -%}
+                  {%- assign article_title = 'Skin Benefits And Uses Of ' -%}
+                  {%- else -%}
+           {%- assign article_title = article.title -%}
+          {% endif %}
+          <h2>{{ article_title }}</h2>
+          <h1>{{ article.title }}</h1>
+          <p class="ingredient-card__excerpt">{{ article.excerpt | strip_html }}</p>
+        </div>
+   <div class="card-image three-fifths padding_left blog-card__image">
+     <figure class="ingredient-card__image">
+                  {% render 'image-element',
+                                image: article.image,
+                                alt: article.image.alt,
+                                stretch_width: true
+                        %}
+     </figure>
+    </div>
+      {% if article.image != blank %}
+        <!-- <div class="card-image three-fifth blog-card__image">
+        </div> -->
+    {% endif %}
+  </div>
+  <div class="ingredient__container ingredient__social">
+      <a class="go_back_link" href="{{ section.settings.go_back_url }}">
+        <svg aria-hidden="true" focusable="false" role="presentation" class="slick-arrow__icon" width="20px" height="15px" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1203 544q0 13-10 23L800 960l393 393q10 10 10 23t-10 23l-50 50q-10 10-23 10t-23-10L631 983q-10-10-10-23t10-23l466-466q10-10 23-10t23 10l50 50q10 10 10 23z"></path></svg>{{ section.settings.go_back_title }}
+      </a>
+      {% render 'social-share-buttons', context: 'article' %}
+  </div>
+
+  {% assign article_content = article.content | split: '<!-- product -->' %}
+	{% if article_content.size > 1 %}
+		<div class="ingredient__container content">
+			{{ article_content | first }}
+		</div>
+		{% if article.metafields.custom_fields.product_ad != blank
+			 and article.metafields.custom_fields.product_ad_title != blank
+			 and article.metafields.custom_fields.product_ad_description != blank %}
+			{% include 'product-ad', ad_handle: article.metafields.custom_fields.product_ad, ad_title: article.metafields.custom_fields.product_ad_title, ad_description: article.metafields.custom_fields.product_ad_description %}
+		{% endif %}
+		<div class="ingredient__container content">
+			{% for content in article_content offset: 1 %}
+				{{ content }}
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="ingredient__container content">
+			{{ article_content }}
+		</div>
+	{% endif %}
+
+    <hr class="divider">
+
+    {% unless related_products == empty %}
+      <section class="product-carousel__container">
+          <h2 class="max-width-container">{{ section.settings.products_containing }} {{ article.title }}</h2>
+          {% render 'product-carousel', handles: related_products %}
+      </section>
+    {% endunless %}
+  
+<!---
+  <div class="cards max-width-container">
+	<div class="cards__container">
+	<h3 class="cards__title">{{ section.settings.health_articles }}</h3>
+	<div class="cards__items">
+	{% assign counter = 1 %}
+	  {% assign article_post = article.handle | split:'/' %}
+	  {% paginate blogs['health-articles'].articles by 1000 %}
+		{% for article in blogs['health-articles'].articles %}
+		  {% for tag in article.tags %}
+			{% assign tags_downcase = tag | append: ',' | downcase | append: tags_downcase %} 
+		  {% endfor %}
+		  {% if tags_downcase contains article_post[1] %}      
+			{% include 'card-article', card_article: article %}
+			{% assign counter = counter | minus: 1 %}
+		  {% endif %}
+		  {% if counter == 0 %}
+			{% break %}
+		  {% endif %}
+		{% endfor %}
+	  {% endpaginate %}
+	{% if counter > 0 %}
+	{% for article in blogs['health-articles'].articles limit: counter %}
+		{% include 'card-article', card_article: article %}
+	{% endfor %}
+	{% endif %}
+	</div>
+	</div>
+	{% if article.metafields.custom_fields.health_ingredients != blank %}
+		{% assign ingredient_refs = article.metafields.custom_fields.health_ingredients | split: '|' %}
+		<div class="cards__container cards--span-2">
+			<h3 class="cards__title">{{ section.settings.other_ingredients }}</h3>
+			<div class="cards__items">
+				{% for ingredient_handle in ingredient_refs limit: 2 %}
+          {% assign ingredient_blog_handle = ingredient_handle | replace: '.', '/' %}
+          {% assign ingredient = articles[ingredient_blog_handle] %}
+		  	{% if ingredient != blank %}
+					{% include 'card-image', card_object: ingredient, card_image: ingredient.image, maintain_image: true %}
+			{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+</div>---->
+</div>
+{% schema %}
+  {
+    "name": "Article Ingredient",
+    "settings": [
+      {
+        "type": "text",
+        "id": "go_back_title",
+        "label":"Go Back Button Title",
+        "default": "Go Back to Ingredients"
+      },
+      {
+        "type": "url",
+        "id": "go_back_url",
+        "label":"Go Back Button link"
+      },
+      {
+        "type": "text",
+        "id": "products_containing",
+        "label":"Title",
+        "default": "Products Containing"
+      },
+      {
+        "type": "text",
+        "id": "health_articles",
+        "label":"Title",
+        "default": "Health Articles"
+      },
+      {
+        "type": "text",
+        "id": "other_ingredients",
+        "label":"Title",
+        "default": "Other Ingredients That May Be Of Interest"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

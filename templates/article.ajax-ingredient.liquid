@@ -1,0 +1,24 @@
+{% layout none %}
+
+{% assign related_products_string = '' %}
+{% for tag in article.tags %}
+  {% if tag contains 'related-product::' %}
+    {% assign related_product_handle = tag | remove: 'related-product::' %}
+    {% assign related_products_string = related_products_string | append: ',' | append: related_product_handle %}
+  {% endif %}
+{% endfor %}
+{% assign related_products_string = related_products_string | remove_first: ',' %}
+{% assign related_products = related_products_string | split: ',' %}
+
+{% if related_products.size > 0 %}
+  <h3 class="ingredient-card__products-heading">Found In</h3>
+  <ul class="ingredient-card__products-list">
+    {% for related_product in related_products %}
+      {% assign item = all_products[related_product] %}
+      {% if item != empty %}
+        <li class="ingredient-card__product"><a class="ingredient-card__product-link" href="{{ item.url }}">{{ item.title }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+{% section 'custom-fields-articles' %}

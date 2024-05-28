@@ -1,0 +1,34 @@
+<div class="modal" data-modal="modal-atc">
+    <div class="atc__title">{{ settings.atc_title }}</div>
+    {% if settings.freeshipping_indicator_minicart %}{% render 'free-shipping-indicator' %}{% endif %}
+    <div class="atc__free-shipping js-atc-shipping" style="display:none;"></div>
+    <div class="atc__item js-atc-item">
+      <div class="atc__item-quantity js-atc-quantity"></div>
+      <div class="atc__item-price js-atc-price"></div>
+    </div>
+    <div class="atc__subtotal">
+      <span class="atc__subtotal-title">{{ settings.atc_subtotal }}</span>
+      <span class="atc__subtotal-price js-atc-subtotal"></span>
+      {% if settings.tax-messaging != blank %}
+        <span class='tax-messaging atc__tax-messaging'>{{ settings.tax-messaging }}</span>
+      {% endif %}
+    </div>
+    <div class="atc__misc">
+      {% comment %}Only show join messaging to non subscribers and logged out customers{% endcomment %}
+      {% assign special_discounts = "lp-flexi,lp-auto,wholesale,lp-20,lp-30,staff-purchase" | split: "," %}
+      {% assign is_special_discount = false %}
+        {% for special_discount in special_discounts %}     	 
+          {% if customer.tags contains special_discount %}
+              {% assign is_special_discount = true %}
+          {% endif %} 
+        {% endfor %}
+      {% unless is_special_discount == true %}
+        {% if settings.atc_loyalty_message %}<p>{{ settings.atc_loyalty_message }} {% if settings.atc_loyalty_link %}<a href="{{ settings.atc_loyalty_link }}">{{ settings.atc_loyalty_link_text }}</a>{% endif %}</p>{% endif %}
+      {% endunless %}     
+      <p>{{ settings.atc_shipping_msg }}</p>
+    </div>
+    <div class="atc__cta">
+      <a class="atc__checkout btn button button--primary" href="/cart">{{ settings.atc_cart_btn }}</a>
+      <button class="atc__continue btn-text-link" data-modal-hide>{{ settings.atc_shop_btn }}</button>
+    </div>
+  </div>

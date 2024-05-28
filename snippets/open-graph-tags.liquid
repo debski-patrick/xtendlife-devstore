@@ -1,0 +1,78 @@
+<meta property="og:title" content="{{ page_title }}" />
+<meta property="og:url" content="{{ canonical_url }}" />
+<meta property="og:site_name" content="{{ shop.name }}" />
+
+{% if page_description %}
+  <meta property="og:description" content="{{ page_description }}" />
+{% endif %}
+
+{% if template contains 'product' %}
+  {% assign member_tags = "lp-standard,lp-auto,lp-flexi,lp-20,lp-30" | split: "," %}
+  {% assign member_discounts = "0.90,0.85,0.90,0.80,0.70" | split: "," %}
+  
+  {%- assign member_price = '' -%}
+  {%- assign product_price = product.price -%}
+  {%- assign product_compare_at_price = product.compare_at_price_max -%}
+  
+  {% unless product.tags contains 'lp-discount-exclusion' %}
+    {% for member_tag in member_tags %}
+      {%- if customer and customer.tags contains member_tag -%}
+        {% if product_compare_at_price > product_price %}
+          {%- assign product_compare_at_price = product.compare_at_price_max -%}
+  		{%- assign member_discount = member_discounts[forloop.index0] | times: 1 -%}
+          {%- assign member_price = product_compare_at_price | times: member_discount -%}
+        {% else %}
+          {%- assign product_compare_at_price = product_price -%}
+  		{%- assign member_discount = member_discounts[forloop.index0] | times: 1 -%}
+          {% assign member_price = product_compare_at_price | times: member_discount %}
+        {% endif %}
+        {%- assign product_price = member_price -%}
+      {%- endif -%}
+    {% endfor %}  
+  {%- endunless -%}
+  
+  {% for image in product.images %}
+    <meta property="og:image" content="http:{{ image | img_url: '600x' }}" />
+    <meta property="og:image:secure_url" content="https:{{ image | img_url: '600x' }}" />
+  {% endfor %}
+
+  <meta property="og:type" content="product" />
+  <meta property="og:price:amount" content="{{ product_price | money_without_currency }}" />
+  <meta property="og:price:currency" content="{{ shop.currency }}" />
+
+{% elsif template contains 'article' %}
+
+  {% assign img_tag = '<' | append: 'img' %}
+
+  {% if article.image %}
+
+    <meta property="og:image" content="http:{{ article | img_url: '600x' }}" />
+    <meta property="og:image:secure_url" content="https:{{ article | img_url: '600x' }}" />
+
+  {% elsif article.content contains img_tag %}
+
+    {% assign src = article.content | split: 'src="' %}
+    {% assign src = src[1] | split: '"' | first | remove: 'https:' | remove: 'http:' %}
+
+    {% if src %}
+      <meta property="og:image" content="http:{{ src }}" />
+      <meta property="og:image:secure_url" content="https:{{ src }}" />
+    {% endif %}
+
+  {% else %}
+
+    <meta property="og:image" content="http:{{ settings.social-sharing-default | img_url: '1200x630' }}" />
+    <meta property="og:image:secure_url" content="https:{{ settings.social-sharing-default | img_url: '1200x630' }}" />
+
+  {% endif %}
+
+  <meta property="og:type" content="article" />
+
+{% else %}
+
+  {% comment %} <meta property="og:image" content="http:{{ 'open-graph-image.jpg' | assets_url }}" /> {% endcomment %}
+  <meta property="og:image" content="http:{{ settings.social-sharing-default | img_url: '1200x630' }}" />
+  <meta property="og:image:secure_url" content="https:{{ settings.social-sharing-default | img_url: '1200x630' }}" />
+  <meta property="og:type" content="website" />
+
+{% endif %}

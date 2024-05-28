@@ -1,0 +1,105 @@
+<link rel="preload" href="{{ 'unique-selling-points.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'unique-selling-points.css' | asset_url }}">
+<!-- This Isn't Just A "Multi Vitamin" -->
+<style>
+.multi-vitamin.section-{{section.id}} {
+  background-color:{{section.settings.bgcolor}};
+}
+.section-{{section.id}} .quote_section-header h2 {
+  color:{{section.settings.color_title}};
+}
+.section-{{section.id}} .description-area {
+  color:  {{section.settings.content_color}};
+}
+</style>
+<div class="multi-vitamin section-{{section.id}}">
+  <div class="section">
+    {% if section.settings.header != blank %}
+    <div class="quote_section-header text-center">
+      <h2>{{section.settings.header}}</h2>
+    </div>
+    {% endif %}
+    <div class="row-new">
+      {% for block in section.blocks %}
+        {% if block.settings.icon_img != blank %}
+          <div class="multi-vitamin-block text-center">
+            <div class="image-area"><img src="{{block.settings.icon_img | img_url:"master"}}" /></div>
+            <div class="description-area">
+            <p class="h3">{{block.settings.title}}</p>
+            <p>{{block.settings.icon_content}}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Unique Selling Points V1",
+    "settings": [
+      {
+        "type": "color",
+        "id": "bgcolor",
+        "label": "Background Color",
+        "default": "#cae9fb"
+      },
+      {
+        "type": "text",
+        "id": "header",
+        "label": "Header",
+        "default": "A Complete Nutrient System"
+      },
+      {
+        "type": "color",
+        "id": "color_title",
+        "label": "Title Color",
+        "default": "#4271a9"
+      },
+      {
+        "type": "color",
+        "id": "content_color",
+        "label": "Content Color",
+        "default": "#4271a9"
+      }
+    ],
+    "max_blocks": 4,
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image with text",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "icon_img",
+            "label": "Icon Image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Icon Title"
+          },
+          {
+            "type": "text",
+            "id": "icon_content",
+            "label": "Content",
+            "default": "Icon Content"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "category": "Image with Text",
+      "name": "Unique Selling Points V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

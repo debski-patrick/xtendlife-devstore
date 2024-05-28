@@ -1,0 +1,34 @@
+<link rel="preload" href="{{ 'text-bar.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'text-bar.css' | asset_url }}">
+{%- unless section.settings.text_bar == blank -%}
+<div class="text_bar-container">
+    <div class="header__promo">
+      <p>{{ section.settings.text_bar }}</p>
+    </div>
+</div>
+{%- endunless -%}
+
+{% schema %}
+  {
+    "name": "Text Bar",
+    "settings": [
+	  {
+		"type": "text",
+		"id": "text_bar",
+		"label": "Text bar"
+	  }
+     ],
+	"presets":[
+      {
+        "category":"Text",
+        "name":"Text Bar"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

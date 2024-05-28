@@ -1,0 +1,100 @@
+  .manufacturing_image {
+  	background: #00A9D5;
+    padding: 15px 0;
+  }
+.gallery_header h2 {
+  font-size: 48px !important;
+  color: #fff;
+  font-size: 20px;
+}
+.gallery_header p {
+	font-size: 16px;
+	color: #fff;
+}
+.gallery_header {
+  padding: 50px 0;
+  margin: 0 auto;
+  text-align: center;
+}
+  /* .manufacturing_image .slick-arrow svg path {
+    fill: #9e9e9e;
+  } */
+.gallery_info {
+	color: #fff;
+	text-align: left;
+	padding: 30px 0;
+}
+.gallery_info h3{
+  font-family: Arimo-Bold;
+  font-size: 30px;
+}
+.gallery_info span{
+  font-family: Arimo-Regular;
+  font-size: 20px;
+}
+.gallery_info p{
+  font-family: Arimo-Regular;
+  font-style: italic;
+  font-size: 20px;
+  margin-top: 10px;
+}
+  @media only screen and (min-width: 1350px){
+   .manufacturing_image .slick-arrow svg {
+      height: 60px;
+      width: 60px;
+    }
+    .manufacturing_image .slick-prev {
+      left: -50px;
+    }
+    .manufacturing_image .slick-next {
+      right: -15px;
+    }
+  }
+@media only screen and (min-width: 768px){
+  .gallery_slider .gallery_img.slick-slide {
+	padding: 15px;
+    /* width: 27% !important; */
+  }
+}
+  @media only screen and (min-width: 768px) and (max-width: 1349px){
+    .manufacturing_image .slick-arrow svg {
+      height: 40px;
+      width: 40px;
+    }
+    .manufacturing_image .slick-prev {
+      left: -27px;
+    }
+    .manufacturing_image .slick-next {
+      right: -10px;
+    }
+  }
+  @media only screen and (max-width: 767px){
+    .manufacturing_image .slick-dots li.slick-active {
+	background-color: #ffffff;
+	opacity: 1;
+}
+    .manufacturing_image .slick-dots li {
+	border-radius: 50%;
+	width: 8px;
+	height: 8px;
+	background-color: #fff;
+	opacity: .8;
+	margin: 0 8px;
+}
+   .manufacturing_image .slick-dots{
+      bottom: -25px;
+      margin: 0;
+    }
+ .manufacturing_image .slick-next {
+	right: 32px;
+	bottom: -25px;
+	transform: unset;
+	top: unset;
+}
+     .manufacturing_image .slick-prev {
+	left: 32px;
+	bottom: -25px;
+	transform: unset;
+	top: unset;
+}
+  }

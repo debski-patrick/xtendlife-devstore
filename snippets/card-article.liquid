@@ -1,0 +1,15 @@
+<div class="card__item">
+    {% if card_article.image %}
+      <figure class="card__item-image"><img class="lazyload" src="{{ card_article.image | img_url: '20x12', crop: 'center', format: 'pjpg' }}" data-src="{{ card_article.image | img_url: '384x222', crop: 'center', format: 'pjpg' }}" data-srcset="{{ card_article.image | img_url: '384x222', crop: 'center', format: 'pjpg' }} 1x, {{ card_article.image | img_url: '384x222', scale: 2, crop: 'center', format: 'pjpg' }} 2x" alt=""></figure>
+    {% endif %}
+    <div class="card__item-details">
+        <h3 class="card__item-title"><a href="{{ card_article.url }}" title="{{ card_object.title }}">{{ card_article.title }}</a></h3>
+      {% if card_article.metafields.custom_fields.excerpt != blank %}
+        <p class="card__item-text">{{ card_article.metafields.custom_fields.excerpt | strip_html }}</p>
+      {% else %}
+        <p class="card__item-text">{{ card_article.content | strip_html | truncate: 250 }}</p>
+      {% endif %}
+      <div class="card__item-link"><a href="{{ card_article.url }}" title="{{ card_object.title }}">{{ 'blogs.general.continue_reading_html' | t }}</a></div>
+    </div>
+  </div>
+  

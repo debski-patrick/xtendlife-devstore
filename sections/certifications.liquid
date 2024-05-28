@@ -1,0 +1,52 @@
+<link rel="preload" href="{{ 'certifications.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'certifications.css' | asset_url }}">
+<div class="certifications-section">
+  <div class="certifications-section__inner section">
+    <div class="certifications-section__title">
+      {{ section.settings.header }}
+    </div>
+    {%- for block in section.blocks -%}
+    <div class="certification">
+    {% if block.settings.image != blank %}        
+        <img class="lazyload" data-src="{{ block.settings.image | img_url: 'x60' }}" alt="{{ block.settings.image.alt | escape }}">         
+    {% else %}      
+      {{ 'logo' | placeholder_svg_tag: 'placeholder-svg' }}       
+    {% endif %}
+       </div>
+    {%- endfor -%}
+  </div>
+</div>
+  
+{% schema %}
+ {
+  "name": "Certifications",
+  "class": "certifications-section",
+  "settings": [
+    {
+      "id": "header",
+      "type": "text",
+      "label": "Header",
+      "default": "XTEND-LIFE CERTIFICATIONS, MEMBERSHIPS & QUALIFICATIONS:"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Certification",
+      "type": "certification",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+    "category": "Components",
+    "name": "Certifications"
+    }
+  ]
+ }
+{% endschema %}

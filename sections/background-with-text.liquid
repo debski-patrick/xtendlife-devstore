@@ -1,0 +1,49 @@
+<style>
+    .bg-{{ section.id }}{
+      background-color: #cce9f9;
+      color: #3f7cbf;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .bg-{{ section.id }} p{
+      font-size: 1.2rem;
+      font-weight: 600;
+      font-family: Montserrat,Arial,sans-serif;
+    }
+    @media only screen and (max-width: 767px){
+      .bg-{{ section.id }} p{
+        font-size: .9rem;
+      }
+    }
+  </style>
+  <div class="section">        
+    <div class="bg-{{ section.id }}">
+      <p>{{ section.settings.description }}</p>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Background with text V1",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "description",
+        "label": "Description"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Text",
+      "name": "Background with text V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

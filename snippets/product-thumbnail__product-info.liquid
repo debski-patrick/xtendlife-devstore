@@ -1,0 +1,78 @@
+<div class="product-thumbnail">
+  {% if settings.display_vendor %}
+    <span class="product-thumbnail__vendor">{{ product.vendor }}</span>
+  {% endif %}
+
+
+    {% if settings.enable_shopify_collection_badges %}
+    <div class="product-thumbnail__review-stars is-flex is-justify-{{ settings.thumbnail_text_alignment }}">
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    </div>
+  {% endif %}
+    {% if hover_enabled %}
+    <span class="product-thumbnail__title">{{ product.title }}</span>
+  {% else %}
+  <h3 class="product-grid__item-title">
+    <a href="{{ product.url }}" class="product-thumbnail__title">{{ product.title }}</a>
+  </h3>
+  {% endif %}
+  {%- if product.metafields.custom_fields.option_text != blank -%}
+              <div class="qty-selector__variant-details">
+                {{ product.metafields.custom_fields.option_text | remove: 'Size:' }}
+              </div>
+            {%- endif -%}
+  {% comment %}
+  {%- if product.metafields.custom_fields.product_summary != blank -%}
+  	<div class="product-grid__item-desc"><a class="link_pro" href="{% if collection %}{{ product.url }}{% else %}{{ product.url }}{% endif %}">{{ product.metafields.custom_fields.product_summary }}<p><span style="color: #3f7cbf;margin-bottom: 7px;display:block;font-size:.855rem"><u>Learn More</u></span></p></a></div>
+  {%- else if product.description and template.name = "index"   -%}
+  	<div class="product-grid__item-desc"><a class="link_pro" href="{% if collection %}{{ product.url }}{% else %}{{ product.url }}{% endif %}">{{ product.description | strip_html | truncate: 90 }}<p><span style="color: #3f7cbf;margin-bottom: 7px;display:block;font-size:.855rem"><u>Learn More</u></span></p></a></div>
+  {%- endif -%}
+  {% endcomment %}
+  {% if collection_handles contains 'coming-soon' %}
+    {% if settings.stickers_enabled == false %}
+      {{ 'collections.general.coming_soon' | t }}
+    {% endif %}
+  {% else %}
+  {% assign member_tags = "lp-standard,lp-auto,lp-flexi,lp-20,lp-30" | split: "," %}
+  {% assign member_discounts = "0.90,0.85,0.90,0.80,0.70" | split: "," %}
+  
+  {%- assign member_price = '' -%}
+  {%- assign product_price = product.price -%}
+  {%- assign product_compare_at_price = product.compare_at_price_max -%}
+  
+  {% unless product.tags contains 'lp-discount-exclusion' %}
+    {% for member_tag in member_tags %}
+      {%- if customer and customer.tags contains member_tag -%}
+        {% if product_compare_at_price > product_price %}
+          {%- assign product_compare_at_price = product.compare_at_price_max -%}
+  		{%- assign member_discount = member_discounts[forloop.index0] | times: 1 -%}
+          {%- assign member_price = product_compare_at_price | times: member_discount -%}
+        {% else %}
+          {%- assign product_compare_at_price = product_price -%}
+  		{%- assign member_discount = member_discounts[forloop.index0] | times: 1 -%}
+          {% assign member_price = product_compare_at_price | times: member_discount %}
+        {% endif %}
+        {%- assign product_price = member_price -%}
+      {%- endif -%}
+    {% endfor %}  
+  {%- endunless -%}
+
+    <div class="product-grid__item-price-sizing {% if item.handle == 'give-a-gift-card' %}hide{% endif %}">
+      <div class="product-grid__item-price{% if product_compare_at_price > product_price or member_price != blank %} product-grid__item-price--sale{% endif %}">
+      {%- if product_compare_at_price > product_price -%}
+        <span class="product-grid__item-price-compare">{{ product_compare_at_price | money }}</span>
+      {%- endif -%}
+    {{ product_price | money }} <span>{{ cart.currency.iso_code }}</span>
+        {% comment %}{%- if settings.tax-messaging != blank -%}
+          <span class="tax-messaging">{{ settings.tax-messaging }}</span>
+        {%- endif -%}{% endcomment %}
+
+      </div>
+      {% comment %}{%- if item.metafields.custom_fields.option_text != blank -%}
+        <div class="product-grid__item-sizing">
+          {{ item.metafields.custom_fields.option_text }}
+        </div>
+      {%- endif -%}{% endcomment %}
+    </div>
+  {% endif %}
+</div>

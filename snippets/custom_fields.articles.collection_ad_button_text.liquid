@@ -1,0 +1,9 @@
+{% if article.metafields["custom_fields"]["collection_ad_button_text"] != blank %}
+  <div class="custom-field custom-field__collection-ad-button-text custom-field__type--text">
+    <h3 class="custom-field--title">Collection Ad Button Text</h3>
+    <div class="custom-field--value">
+      {{ article.metafields["custom_fields"]["collection_ad_button_text"] }}
+
+    </div>
+  </div>
+{% endif %}

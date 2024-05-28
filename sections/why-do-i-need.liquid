@@ -1,0 +1,179 @@
+<style>    
+    .why-need-{{section.id}} .why-need {
+      background: #cae9fb;
+      margin-top: 30px;
+      border-radius: 30px;
+      margin-bottom: 0;
+    }
+    .why-need-{{section.id}} h2 {
+      color: #3f7cbf;      
+      font-weight: 600;
+      margin: 30px 0 10px;
+    }
+    .why-need-{{section.id}} .why-need-sortdsc{
+      margin-bottom: 30px;
+    }
+    .why-need-{{section.id}} .why-need-sortdsc p{
+      margin-bottom: 15px;
+    }
+    .why-need-{{section.id}} .why-need-sortdsc p:last-child{
+      margin-bottom: 0px;
+    }
+    .why-need-{{section.id}} .why-need .flex {
+      display: flex;
+      flex-flow: row wrap;
+      width: 100%;
+      position: relative;
+    }
+    .why-need-img {
+      float: right;
+    }
+    .why-need-{{section.id}} .why-need-title {
+      color: #3f7cbf;
+      font-size: 24px;
+      font-family: Montserrat,sans-serif;
+      line-height: 1.1;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .why-need-{{section.id}} .why-need-description p{
+      margin-bottom: 15px;
+    }
+    .why-need-{{section.id}} .why-need-description p:last-child{
+      margin-bottom: 0px;
+    }
+    
+/*     .why-need-img img {
+      width: 110px;
+    } */
+    @media only screen and (min-width: 768px){
+      .why-need-{{section.id}} .why-need {
+        padding: 0 20px;
+      }
+      .why-need-{{section.id}} .why-need .one-half {
+        display: flex;
+        flex: 0 1 50%;
+        flex-flow: column;
+        margin-bottom: 30px;
+      }
+      .why-need-{{section.id}} .why-need .one-half:nth-child(2n+1) {
+        padding-right: 20px;
+      }
+      .why-need-{{section.id}} .why-need-content {
+        border-radius: 20px;
+        padding: 30px 20px;
+/*         display: flex; */
+        height: 100%;
+        background: #fff;
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+    @media only screen and (max-width: 991px){
+      .why-need-img {
+        float: none;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .why-need-{{section.id}} .why-need{
+        margin: 0;
+      }
+    } 
+    @media only screen and (max-width: 767px){
+      .why-need-{{section.id}} .why-need{
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+      .why-need-{{section.id}} .why-need-content {
+        border-radius: 20px;
+        padding: 30px;
+        background: #fff;
+        margin-bottom: 30px;
+      }
+      .why-need-{{section.id}} .why-need-title{
+        font-size: 15.5px;
+        text-align: center;
+      }
+      .why-need-{{section.id}} .why-need-description p{
+        font-size: .875rem;
+      }
+    }
+  </style>
+  <div class="why-need-{{section.id}}">
+    <div class="section">
+      <div class="row why-need">
+        <div class="one-whole">
+          <h2>{{ section.settings.title }}</h2>
+          <div class="why-need-sortdsc">
+          {{ section.settings.description }}
+          </div>
+        </div>
+        <div class="flex is-justify-space-between equal-columns--outside-trim">
+          {% for block in section.blocks %}
+          <div class="one-half medium-down--one-whole">
+            <div class="why-need-content">
+              <div class="why-need-img"><img src="{{block.settings.image | img_url: 'master'}}"></div>
+              <div class="why-need-title">{{block.settings.title}}</div>             
+              <div class="why-need-description">
+              {{block.settings.description}}
+              </div>                
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Why Do I need V1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "title"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      }
+    ],
+    "blocks":[
+      {
+        "type": "image",
+        "name": "Image with Text",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "Image size 100x100 px"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "category": "Text",
+      "name": "Why Do I need V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,169 @@
+<style>
+    .section.iwtb-template--14721356365921__80a3574c-c1a9-427f-b6d8-85c541cc48d3{
+      max-width: 100%;
+    }
+    .iwtb-{{section.id}} .flex-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      text-align: left;
+      margin-top: 50px;
+    }
+    .iwtb-{{section.id}} .flex-box {
+      display: flex;
+      align-items: center;
+      background: #E8E8E8;
+      border-radius: 10px;
+      padding: 15px 30px;
+      margin-top: 15px;
+    }
+    .iwtb-{{section.id}} .flex-box:first-child {
+      margin-left: 0;
+    }
+    .iwtb-{{section.id}} p.flex-title {
+      font-size: 20px;
+      font-family: Arimo-Bold;
+      color: #005895;
+      margin-bottom: 5px;
+      word-break: break-word;
+      line-height: 1.1;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    .iwtb-{{section.id}} p.flex-desc {
+      text-align: left;
+      margin: 15px 0;
+      font-size: 16px;
+      font-family: Lora-Regular;
+    }    
+    .multivitamin_info {
+     padding-left: 20px;
+    }
+    .multi_info {
+      padding-left: 70px;
+    }
+    .multi_leftpart h2 {
+      font-size: 44px;
+    }
+    .multi_leftpart p, .multi_leftpart ul, .multi_leftpart li {
+      padding-top: 15px;
+      font-size: 16px;
+      font-family: lora-regular;
+    }
+    @media only screen and (max-width: 990px){
+      .iwtb-{{section.id}} .flex-container{
+        flex-wrap: wrap;
+      }
+      .iwtb-{{section.id}} .flex-box{
+        flex: 0 1 100%;
+        margin-bottom: 30px;
+        margin-right: 0;
+        margin-left: 0;
+      }
+      .iwtb-{{section.id}} .flex-box:first-child {
+        margin-top: 0;
+      }
+      .iwtb-{{section.id}} .flex-box:last-child {
+        margin-bottom: 0;
+      }
+      .iwtb-{{section.id}} .flex-box img {
+        width: 100px;
+      }
+      .iwtb-{{section.id}} p.flex-title {
+        font-size: 15.5px;
+      }
+      .iwtb-{{section.id}} p.flex-desc{
+        font-size: .875rem;
+      }
+      .multi_info {
+      padding-top: 40px;
+      padding-left: 0;
+     }
+    .multi_leftpart h2, .quote_section-header h2 {
+      font-size: 24px !important;
+      }
+    }
+  </style>
+  <div class="section iwtb-{{section.id}}">
+    <div class="flex-container">
+      <div class="multi_leftpart">
+       <h2>{{ section.settings.title }}</h2>
+        {{ section.settings.richcontent }}
+        {% if section.settings.image != blank %}
+          <img src="{{ section.settings.image | img_url: "165x"}}" alt="{{ section.settings.title }}">
+        {% endif %}
+      </div>
+      <div class="multi_info">
+      {% for block in section.blocks %}
+      	{% if block.settings.image != blank or block.settings.title != blank or block.settings.description != blank %}
+        <div class="flex-box">
+          {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | img_url: "165x"}}" alt="{{ block.settings.title }}">
+          {% endif %}
+          <div class="multivitamin_info">
+          <p class="flex-title">{{block.settings.title}}</p>
+          <p class="flex-desc">{{block.settings.description}}</p>
+          </div>
+        </div>
+      	{% endif %}
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+{% schema %}
+  {
+    "name": "Image with Text column V1",
+    "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "richtext",
+      "id": "richcontent",
+      "label": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "background title"
+    }
+    ],
+    "blocks":[
+      {
+        "type": "image",
+        "name": "Image with Text column",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "textarea",
+            "id": "description",
+            "label": "Description"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "category": "Text",
+      "name": "Image with Text column V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

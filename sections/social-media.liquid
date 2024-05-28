@@ -1,0 +1,103 @@
+<link rel="preload" href="{{ 'social-media.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'social-media.css' | asset_url }}">
+<div class="section">
+  <div class="social-media_new_section">
+    {% if section.settings.title != blank %}
+    <div class="section-header text-center">
+    	<div>{{ section.settings.title }}</div>
+    </div>
+    {% endif %}
+    <div class="social-media-new-icons">
+      {% if section.settings.facebook_icon != blank %}
+        <div>
+          <a href="{{ section.settings.facebook_icon }}">
+            {% render 'icon-facebook-new' %}
+            <span class="visually-hidden">Facebook</span>
+          </a>
+        </div>
+      {% endif %}
+      {% if section.settings.pinterest_icon != blank %}
+        <div>
+          <a href="{{ section.settings.pinterest_icon }}">
+            {% render 'icon-pinterest-new' %}
+            <span class="visually-hidden">Pinterest</span>
+          </a>
+        </div>
+      {% endif %}
+      {% if section.settings.instagram_icon != blank %}
+        <div>
+          <a href="{{ section.settings.instagram_icon }}">
+            {% render 'icon-instagram-new' %}
+            <span class="visually-hidden">Instagram</span>
+          </a>
+        </div>
+      {% endif %}
+      {% if section.settings.twitter_icon != blank %}
+        <div>
+          <a href="{{ section.settings.twitter_icon }}">
+            {% render 'icon-twitter-new' %}
+            <span class="visually-hidden">Twitter</span>
+          </a>
+        </div>
+      {% endif %}
+      {% if section.settings.youtube_icon != blank %}
+        <div>
+          <a href="{{ section.settings.youtube_icon }}">
+            {% render 'icon-youtube-new' %}
+            <span class="visually-hidden">Youtube</span>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Social Media",
+    "settings": [
+	  {
+		"type": "text",
+		"id": "title",
+		"label": "Title",
+		"default": "Follow Us on Social Media"
+	  },
+	  {
+		"type": "text",
+		"id": "facebook_icon",
+		"label": "Facebook Link"
+	  },
+	  {
+		"type": "text",
+		"id": "pinterest_icon",
+		"label": "Pinterest Link"
+	  },
+	  {
+		"type": "text",
+		"id": "instagram_icon",
+		"label": "Instagram Link"
+	  },
+	  {
+		"type": "text",
+		"id": "twitter_icon",
+		"label": "Twitter Link"
+	  },
+	  {
+		"type": "text",
+		"id": "youtube_icon",
+		"label": "YouTube Link"
+	  }
+	],
+	"presets": [
+      {
+        "name": "Social Media",
+        "category": "Components"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

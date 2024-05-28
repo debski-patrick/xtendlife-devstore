@@ -1,0 +1,62 @@
+<style>
+    .title-with-text-{{section.id}} h2{
+      color: #3f7cbf;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    .title-with-text-{{section.id}} p{
+      margin-bottom: 15px;
+    }
+    .title-with-text-{{section.id}} p:last-child{
+      margin-bottom: 0px;
+    }
+    .title-with-text-{{section.id}} ul li strong{
+      font-size: 18px;
+      font-family: Montserrat,Arial,sans-serif;
+      color: #3f7cbf;
+    }
+    @media only screen and (max-width: 767px){
+      .title-with-text-{{section.id}} p{
+        font-size: .875rem;
+      }
+    }
+  </style>
+  <div class="section title-with-text-{{section.id}}">
+    <h2 {% if section.settings.title_class != blank %}class="{{ section.settings.title_class }}"{% endif %}>{{ section.settings.title }}</h2>
+    <div>{{ section.settings.description }}</div>
+  </div>
+{% schema %}
+  {
+    "name": "Title and description v1",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title_class",
+        "label": "Title Class",
+        "default": "h1"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description"
+      }
+    ],
+    "presets": [
+      {
+      "category": "Text",
+      "name": "Title and description v1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

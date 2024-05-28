@@ -1,0 +1,99 @@
+<link rel="preload" href="{{ 'our-key-people.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'our-key-people.css' | asset_url }}">
+<style>
+  .expert_section.block-{{section.id}} {
+    background-color:{{section.settings.bgcolor}};
+    display: block;
+    float: left;
+    width: 100%;
+  }
+</style>
+<div class="expert_section block-{{section.id}}">
+  <div class="section">
+    <div class="quote_section-header text-center">
+      <h2>{{ section.settings.title }}</h2>	
+    </div>
+    <div class="expert-sections">
+      {% for block in section.blocks %}
+      <div class="expert four medium-down--one-whole">
+        <img class="expert_img" src="{{ block.settings.image | img_url:"grande"}}"/>
+        <h3 class="exp_title">{{ block.settings.title}}</h3>
+        <p class="departmnt">{{ block.settings.department}}</p>
+        {% if block.settings.popupcontent != blank %}
+        <div class="plus_popup"><p><img src="{{ 'Add.png' | file_url }}"></p>
+          <div class="popuprofl_cnt section" style="display:none;">
+            <div class="clsclick">
+              <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close" viewBox="0 0 20 20"><path fill="#444" d="M15.89 14.696l-4.734-4.734 4.717-4.717c.4-.4.37-1.085-.03-1.485s-1.085-.43-1.485-.03L9.641 8.447 4.97 3.776c-.4-.4-1.085-.37-1.485.03s-.43 1.085-.03 1.485l4.671 4.671-4.688 4.688c-.4.4-.37 1.085.03 1.485s1.085.43 1.485.03l4.688-4.687 4.734 4.734c.4.4 1.085.37 1.485-.03s.43-1.085.03-1.485z"></path></svg>
+            </div>
+            {{ block.settings.popupcontent }}
+            <div class="profile_cls clsclick">
+              <a href="JavaScript:void(0)">Close</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Our Key People V1",
+    "settings": [
+      {
+        "type": "color",
+        "id": "bgcolor",
+        "label": "Background Color",
+        "default": "#e3ebf6"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Slide",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "text",
+            "id": "department",
+            "label": "Department"
+          },
+          {
+            "type": "html",
+            "id": "popupcontent",
+            "label": "Popup content"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Our Key People V1",
+        "category": "Popup",
+        "settings": {
+        }
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,12 @@
+{% layout none %}
+
+<div class="atc__item-image js-atc-image"><img src="{{ product | img_url: '75x96', crop: 'center' }}" srcset="{{ product | img_url: '75x96', crop: 'center' }} 1x, {{ product | img_url: '150x192', crop: 'center' }} 2x"></div>
+<div class="atc__item-details js-atc-details">
+  <div class="atc__item-title">{{ product.title }}</div>
+  {% render 'junip-product-summary', product: product %}
+  <div class="atc__item-variant js-atc-variant"></div>
+  {% if product.metafields.custom_fields.option_text != blank %}
+    <div class="atc__item-option">{{ product.metafields.custom_fields.option_text }} </div>
+  {% endif %}
+</div>
+{% render 'junip-product-review', product: product %}

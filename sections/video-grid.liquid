@@ -1,0 +1,93 @@
+<style>
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+      position: relative;
+    }
+    .video-grid.block-{{section.id}} {
+      padding-bottom: 45px;
+    }
+    .video-grid.block-{{section.id}} .row{
+      margin-bottom: 0;
+    }
+    .video-grid.block-{{section.id}} .video_main h5 {
+      text-align: center;
+      margin: 15px 0;
+      color: #1b3281;
+      display: block;
+      width: 100%;
+      float: left;
+      font-size: 15px;
+    }
+  </style>
+  <div class="video-grid block-{{section.id}}">
+    <div class="section">
+      <div class="row is-justify-space-between equal-columns--outside-trim">
+        {% for block in section.blocks %}
+          <div class="one-third large-down--one-whole video_main">          
+            <div class="embed-container" style="text-align: center;"><iframe src="https://player.vimeo.com/video/{{block.settings.video_id}}"></iframe></div>
+            <div><h5>{{ block.settings.title }}</h5></div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% schema %}
+    {
+      "name": "Video Grid V1",
+      "settings": [
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        }
+      ],
+      "max_blocks": 3,
+      "blocks": [
+        {
+          "type": "Video",
+          "name": "Video Grid",
+          "settings": [
+            {
+              "type": "text",
+              "id": "video_id",
+              "label": "Video 1 Id",
+              "default": "LR5nQKi6rEU"
+            },
+            {
+              "type": "text",
+              "id": "title",
+              "label": "Video Title"
+            }
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "name": "Video Grid V1",
+          "category": "Video",
+          "settings": {
+          }
+        }
+      ]
+    }
+  {% endschema %}
+  
+  {% stylesheet %}
+  {% endstylesheet %}
+  
+  {% javascript %}
+  {% endjavascript %}

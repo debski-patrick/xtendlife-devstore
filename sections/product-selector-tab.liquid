@@ -1,0 +1,308 @@
+<link rel="preload" href="{{ 'product-selector-tab.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'product-selector-tab.css' | asset_url }}">
+<!-- Buy It SEPERATELY  and RECOMMENDED ---->
+<style>
+  .section-{{section.id}} .quote_section-header h2 {
+    color:{{section.settings.color_title}};
+  }
+  {% if section.settings.custome_css != blank %}
+    {{ section.settings.custome_css }}
+  {% endif %}
+  .product-grid__item-rating .spr-badge-starrating .spr-icon{
+    color: {{settings.reivew_star_color}} !important;
+  }
+    #productbundle-shop {
+  	padding-top: 30px;
+  }
+  @media only screen and (max-width: 767px){
+  .interest .interest__tabs .tabs__nav li {
+    width: 100%;
+  }
+  .tabs__control.js-tab-control {
+    margin-left: 0 !important;
+  }
+  #productbundle-shop {
+  	padding-top: 0px;
+  }
+}
+</style>
+<div id="productbundle-shop" class="section product-info-column section-{{section.id}} {{ section.settings.class_name }}">
+  {% if section.settings.header != blank %}
+    <div class="quote_section-header text-center">
+      <h2>{{section.settings.header}}</h2>
+    </div>
+  {% endif %}
+  <section class="interest tabs js-tabs">
+    <div class="interest__tabs">
+      <ul class="tabs__nav">
+        {% for block in section.blocks %}
+          {% if block.settings.standard_tab != blank %}
+            <li><button class="tabs__control tabs__count-{{ forloop.index }} js-tab-control{% if forloop.index == 1  %} control--active{% endif %}" data-control-for="for_{{ block.settings.standard_tab | handleize }}">{{block.settings.standard_tab}}</button></li>
+            <style>
+              .section-{{section.id}} .interest .interest__tabs .tabs__nav .tabs__control.tabs__count-{{ forloop.index }} {
+                background-color: {{ block.settings.standard_tab_bg }};
+                color: {{ block.settings.standard_tab_text }};
+                border-color: {{ block.settings.standard_tab_border }};
+              }
+              .section-{{section.id}} .interest .interest__tabs .tabs__nav .tabs__control.tabs__count-{{ forloop.index }}.control--active {
+              	background-color: {{ block.settings.standard_tab_bg_active }};
+              	color: {{ block.settings.standard_tab_text_active }};
+              	border-color: {{ block.settings.standard_tab_border_active }};
+              }
+            </style>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="interest__container">
+      {% for block in section.blocks %}
+        {% if block.settings.standard_tab != blank %}
+          <div class="tabs__content js-tab-content{% if forloop.index == 1  %} content--active{% endif %}" data-content="for_{{ block.settings.standard_tab | handleize }}">
+            <div class="product-grid">
+              {% for i in (1..4) %}
+              {% capture tab %}tab_{{i}}{% endcapture %}   
+              {% capture image %}pro_img_{{i}}{% endcapture %}
+              {% capture url %}pro_url_{{i}}{% endcapture %}
+              {% capture bgcolor %}bgcolor_{{i}}{% endcapture %}
+              {%- assign product = all_products[block.settings[url]] -%}
+              {%- assign with_quantity = true -%}
+              
+              {% if product != empty %}
+              <style>
+                .section-{{section.id}} .js-tab-content[data-content="for_{{ block.settings.standard_tab | handleize }}"] .bg_color_premium_{{i}} {
+                  background-color: {{block.settings[bgcolor]}} ;
+                }
+              </style>
+              <div class="product-grid__item js-product bg_color_premium_{{i}}">
+                <div class="pro_heading">{{block.settings[tab]}}</div>
+                <a class="link_pro" href="{{product.url}}" title="Foundational Health Pack For Men">  
+                <div class="product-grid__item-image">
+                                
+                    {% if block.settings[image] != blank %}
+                    <img src="{{ block.settings[image] | img_url:"grande"}}"/>
+                    {% elsif product != empty and block.settings[image] == blank %}
+                    <img src="{{ product.featured_image | img_url:"grande"}}"/>
+                    {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                    {% endif %}
+                  
+                </div>
+                <div class="product-grid__item-details">
+                  <div class="product-grid__item-rating"><span class="shopify-product-reviews-badge" data-id="{{product.id}}"></span></div>
+                  <h3 class="product-grid__item-title">{{product.title}}</h3>
+                  <div class="product-grid__item-price-sizing">
+                    <div class="product-grid__item-price">
+                      {%- if product.metafields.custom_fields.option_text != blank -%}
+                      <div class="product-grid__item-sizing">
+                        {{ product.metafields.custom_fields.option_text }}
+                      </div>
+                      {%- endif -%}
+                    <div class="price_selectoretab">
+                     <span class="price-compare">{{ product.compare_at_price | money }}</span><span class="{% if product.compare_at_price != blank %}saleprice {% else %} tab_price {% endif %}">{{product.price | money }}</span> 
+                    </div>
+                    </div>
+                  </div>
+                  <div class="product-grid__item-desc">
+                    {%- if product.metafields.custom_fields.product_summary_description != blank -%}
+                    {{ product.metafields.custom_fields.product_summary_description }}
+                    {%- endif -%}
+                  </div>
+                </div>
+                </a>
+                {%- if product.variants.size > 1 -%}
+                  <a class="btn btn--atc new_add_tocart_cr" href="{{ product.url }}">Add to Cart</a>
+                  {%- elsif with_quantity == true -%}
+                  {%- include 'add-to-cart' -%}
+                  {%- else -%}
+                  {%- include 'add-to-cart-without-quantity', item: product -%}
+                  {%- endif -%}
+              </div>
+              {% endif %}          
+              {% endfor %}               
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}  
+    </div>
+  </section>
+</div>
+{% schema %}
+  {
+    "name": "Product Selector Tab V1",
+    "settings": [
+      {
+        "type": "color",
+        "id": "standard_tab_bg",
+        "label": "Button background",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "standard_tab_text",
+        "label": "Button text color",
+        "default": "#3f7cbf"
+      },
+      {
+        "type": "color",
+        "id": "standard_tab_border",
+        "label": "Button border color",
+        "default": "#3f7cbf"
+      },
+      {
+        "type": "color",
+        "id": "standard_tab_bg_active",
+        "label": "Active button background",
+        "default": "#1c5497"
+      },
+      {
+        "type": "color",
+        "id": "standard_tab_text_active",
+        "label": "Active button text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "standard_tab_border_active",
+        "label": "Active Button border color",
+        "default": "#3f7cbf"
+      },
+      {
+        "type": "text",
+        "id": "header",
+        "label": "Header",
+        "default": "Foundational Health Products"
+      },
+      {
+        "type": "color",
+        "id": "color_title",
+        "label": "Title Color",
+        "default": "#4271a9"
+      },
+      {
+        "type": "text",
+        "id": "class_name",
+        "label": "Custome Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custome_css",
+        "label": "Custome CSS",
+        "info": "Please make sure to apply custom CSS based on the above class."
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product",
+        "name": "Product Tab",
+        "settings": [
+          {
+            "type": "text",
+            "id": "standard_tab",
+            "label": "Heading",
+            "default": "Tab title"
+          },
+          {
+            "type": "text",
+            "id": "tab_1",
+            "label": "Standard",
+            "default": "Standard"
+          },
+          {
+            "type": "product",
+            "id": "pro_url_1",
+            "label": "Choose Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "pro_img_1",
+            "label": "Product Image"
+          },
+          {
+            "type": "color",
+            "id": "bgcolor_1",
+            "label": "Background Color",
+            "default": "#E3EBF6"
+          },        
+          {
+            "type": "text",
+            "id": "tab_2",
+            "label": "Premium",
+            "default": "Premium"
+          },
+          {
+            "type": "product",
+            "id": "pro_url_2",
+            "label": "Choose Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "pro_img_2",
+            "label": "Product Image"
+          },
+          {
+            "type": "color",
+            "id": "bgcolor_2",
+            "label": "Background Color",
+            "default": "#E3EBF6"
+          },
+          {
+            "type": "text",
+            "id": "tab_3",
+            "label": "Premium",
+            "default": "Premium"
+          },
+          {
+            "type": "product",
+            "id": "pro_url_3",
+            "label": "Choose Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "pro_img_3",
+            "label": "Product Image"
+          },
+          {
+            "type": "color",
+            "id": "bgcolor_3",
+            "label": "Background Color",
+            "default": "#E3EBF6"
+          },
+{
+            "type": "text",
+            "id": "tab_4",
+            "label": "Premium",
+            "default": "Premium"
+          },
+          {
+            "type": "product",
+            "id": "pro_url_4",
+            "label": "Choose Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "pro_img_4",
+            "label": "Product Image"
+          },
+          {
+            "type": "color",
+            "id": "bgcolor_4",
+            "label": "Background Color",
+            "default": "#E3EBF6"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "category": "Product",
+      "name": "Product Selector Tab V1"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,96 @@
+<style>
+    .image_with_text_page_section.block-{{section.id}} .content {
+      background-color:{{ section.settings.bgcolor }};
+      padding: 0 1em;
+      margin-bottom: 0;
+    }
+    .image_with_text_page_section .padd_space {
+      padding: 20px;
+    }
+    .image_with_text_page_section .content p {
+      font-size: 18px;
+    }
+    @media only screen and (max-width: 767px){
+      .image_with_text_page_section .section{
+        width: 100%;
+      }
+    }
+  </style>
+  <div class="image_with_text_page_section block-{{section.id}}">
+    <div class="quote_section-header text-center">
+      <h2>{{ section.settings.title }}</h2>	
+    </div>
+    <div class="section">
+      <div class="row content is-justify-space-between equal-columns--outside-trim is-align-center">
+        {% if section.settings.image != blank %}
+          <div class="three-fifths large-down--one-whole padd_space content" style="text-align: {{ section.settings.text_alignment }}";>
+            <p>{{section.settings.content}}</p>
+          </div>
+          <div class="two-fifths large-down--one-whole padd_space text-center ">
+            <img src="{{ section.settings.image | img_url: 'master' }}">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% schema %}
+    {
+      "name": "Image with text V1",
+      "settings": [
+        {
+          "type": "color",
+          "id": "bgcolor",
+          "label": "Background Color",
+          "default": "#e3ebf6"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Header",
+          "default": "Our Story"
+        },
+        {
+          "type": "html",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ],
+      "presets": [
+        {
+        "category": "text",
+        "name": "Image with text V1"
+        }
+      ]
+    }
+  {% endschema %}
+  
+  {% stylesheet %}
+  {% endstylesheet %}
+  
+  {% javascript %}
+  {% endjavascript %}

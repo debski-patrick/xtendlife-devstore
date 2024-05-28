@@ -1,0 +1,9 @@
+{% if page.metafields["custom_fields"]["page_title_color"] != blank %}
+  <div class="custom-field custom-field__page-title-color custom-field__type--text">
+    <h3 class="custom-field--title">Page Title Color</h3>
+    <div class="custom-field--value">
+      {{ page.metafields["custom_fields"]["page_title_color"] }}
+
+    </div>
+  </div>
+{% endif %}

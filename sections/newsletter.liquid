@@ -1,0 +1,157 @@
+<link rel="preload" href="{{ 'newsletter.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'newsletter.css' | asset_url }}">
+<div class="section">
+  {% if section.settings.title != blank %}
+  <div class="quote_section-header text-center">
+    <div>{{ section.settings.title }}</div>
+  </div>
+  {% endif %}
+    
+    <section class="newsletter">
+      {% if section.settings.logo_image %}
+      <div class="new_newsletter__logo">
+        <a href="{{ section.settings.logo_link }}">        
+            <img class="lazyload"  data-src="{{section.settings.logo_image | img_url:'x100'}}" alt="{{section.settings.logo_image.alt | escape }}">
+            <span class="visually-hidden">{{shop.name}}</span>    
+        </a>
+      </div>
+      {% endif %}
+      <div class="newsletter_text_1">
+        {% if section.settings.text_1 != blank %}
+        <div class="new_newsletter__text">{{ section.settings.text_1 }}</div>
+        {% endif %}
+      </div>
+      <form id="email_signup" class="klaviyo_styling klaviyo_gdpr_embed_{{section.settings.list_id}}" action="//manage.kmail-lists.com/subscriptions/subscribe" data-ajax-submit="//manage.kmail-lists.com/ajax/subscriptions/subscribe" method="GET" target="_blank" novalidate="novalidate">
+        <input type="hidden" name="g" value="{{section.settings.list_id}}">
+        <div class="klaviyo_form">
+          <div class="klaviyo_messages">
+            <div class="success_message" style="display:none;">
+              <div id="klaviyo_thankYouCheck">
+                <img src="{{'GreenCheck.svg'| asset_url }}" alt="">
+              </div>
+              <div class="klaviyo_successMsg">
+                {{ section.settings.success_text_html }}
+              </div>
+            </div>
+            <div class="error_message" style="display:none;"></div>
+          </div>
+          <div class="klaviyo_form_fields">
+            <div class="klaviyo_field_group">
+              <div class="klaviyo_input_field">
+                <input class="" type="text" value="" name="name" id="k_id_name" placeholder="{{ section.settings.placeholder_name }}" />
+              </div>
+              <div class="klaviyo_input_field">
+                <input class="" type="email" value="" name="email" id="k_id_email" placeholder="{{ section.settings.placeholder_email }}" />
+              </div>
+            </div>
+            <div class="klaviyo_form_actions">
+              <button type="submit" class="klaviyo_submit_button">{{ section.settings.button }}</button>
+            </div>
+          </div>
+        </div>
+      </form>
+   
+        {% comment %} 
+       <div class="cmApp_embedFormContainer" style="display:none;"></div>
+      <form class="newsletter__form" method="POST" action="/">
+      <div class="newsletter__input-group">
+        <input class="newsletter__input" type="text" placeholder="ENTER NAME" required>
+      </div>
+      <div class="newsletter__input-group">
+        <input class="newsletter__input" type="email" placeholder="ENTER EMAIL ADDRESS" required>
+      </div>
+      <div class="newsletter__input-group">
+        <button class="newsletter__submit btn" type="submit">Subscribe</button>
+      </div>
+      </form>  {% endcomment %}    
+    </section>
+  </div>
+
+  <script type="text/javascript" src="//www.klaviyo.com/media/js/public/klaviyo_subscribe.js"></script>
+  <script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function(event) {
+    // Your code to run since DOM is loaded and ready
+    var ss = document.createElement("script");
+    ss.src = "//www.klaviyo.com/media/js/public/klaviyo_subscribe.js";
+    ss.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(ss);
+  }); 
+
+  setTimeout(function () {
+   KlaviyoSubscribe.attachToForms('#email_signup', {
+     hide_form_on_success: true,
+     custom_success_message: true,
+     extra_properties: {
+       $source: '{{ handle }}'
+     }
+   });
+  }, 2000);
+  </script>
+  {% schema %}
+  {
+    "name": "Newsletter",
+    "class": "home-newsletter",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "Subscribe to our Health Matters Newsletter"
+      },
+      {
+        "type": "url",
+        "id": "logo_link",
+        "label": "Link for logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_image",
+        "label": "Logo"
+      },
+      {
+        "type": "richtext",
+        "id": "text_1",
+        "label": "Content"
+      },
+      {
+        "type": "header",
+        "content": "Klaviyo List Id"
+      },
+      {
+        "type": "text",
+        "id": "list_id",
+        "label": "List Id"
+      },
+      {
+        "type": "text",
+        "id": "placeholder_name",
+        "label": "Placeholder Text",
+        "default": "Name"
+      },
+      {
+        "type": "text",
+        "id": "placeholder_email",
+        "label": "Placeholder Text",
+        "default": "Your email"
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Btton Text",
+        "default": "Subscribe"
+      },
+      {
+        "type": "textarea",
+        "id": "success_text_html",
+        "label": "Success message",
+        "default": "<span>Thank you!</span><span>We just sent you an email to confirm your subscription.</span><span>Please click the confirmation link in the email.</span>"
+      }
+    ],
+    "presets": [
+      {
+        "category": "Components",
+        "name": "Newsletter"
+      }
+    ]
+  }
+  {% endschema %}

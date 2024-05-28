@@ -1,0 +1,375 @@
+{% comment %}
+** Registration template - main content area **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+  #template-customers-register .container{
+    justify-content: center;
+    margin-top: 15px;
+  }
+  .heading-wrapper--register h1 {
+    text-transform: uppercase;
+  }
+  #template-customers-register .label{
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .75px;
+  }
+  #template-customers-register .register {
+    max-width: 500px;
+    width: 100%;
+  }
+  #template-customers-register .button--primary{
+    padding: 0.8em 2.2em;
+    text-transform: uppercase;
+  }
+  #template-customers-register .hoverButton{
+    font-weight: 700;
+    font-family: Montserrat,Arial,sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .75px;
+  }
+  .reactivation_register p {
+    margin-bottom: 10px;
+}
+  {% render 'css-loop',
+          css: custom_css,
+          id: id
+  %}
+{% endstyle %}
+
+<section class="section section__wrapper is-width-{{ width }} {{ css_class }}">
+  <header class="container">
+    {%- capture title -%}{{ 'customer.reregister.title' | t }}{%- endcapture -%}
+    <div class="heading-wrapper--register
+      heading-wrapper--short
+      one-whole column
+      is-flex
+      is-flex-column
+      is-align-center
+      text-align-center 
+      padd-bottom-20">
+      <h1>{{ title }}</h1>
+    
+      <small><em>{{ 'customer.reregister.subtitle' | t }}</em></small>
+    
+    </div>
+    {% comment %}
+    {% render 'heading',
+            title: title,
+            heading_tag: 'h1',
+            context: 'register',
+            text_alignment: 'left'
+    %}
+  {% endcomment %}
+  </header>
+
+  <div class="container">
+    <div class="reactivation_register one-half medium-down--one-whole column has-padding-bottom">
+      <div id="customer" class="register__form">
+
+        <!-- Create Customer -->
+        <div id="create-customer">
+
+          {% if section.settings.richtext != blank %}
+            <div class="login__text has-padding-bottom">
+              {{ section.settings.richtext }}
+            </div>
+          {% endif %}
+
+<!-- Start Payment icon  -->
+          
+        {% if section.settings.display_payment_methods %}
+        <div class="footer__payment-methods one-whole column small-down--one-whole">
+          <div class="payment-methods">
+            <ul class="footer__payment-icons">
+              {%- if section.settings.payment_enabled_visa -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-visa' -%}<span class="visually-hidden">Visa</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_master -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-master' -%}<span class="visually-hidden">Master</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_paypal -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-paypal' -%}<span class="visually-hidden">Paypal</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_american_express -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-american_express' -%}<span class="visually-hidden">American Express</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_jcb -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-jcb' -%}<span class="visually-hidden">JCB</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_shoppay -%}
+              <li class="pay_icon1"><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-shoppay' -%}<span class="visually-hidden">Shop Pay</span></a></li>
+              {%- endif -%}
+               {%- if section.settings.payment_enabled_applepay -%}
+              <li class="pay_icon1"><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-applepay' -%}<span class="visually-hidden">Apple Pay</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_gpay -%}
+              <li class="pay_icon1"><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-gpay' -%}<span class="visually-hidden">Google Pay</span></a></li>
+              {%- endif -%}
+              {%- if section.settings.payment_enabled_alipay -%}
+              <li><a href="{{ section.settings.payment_page_url }}">{%- include 'icon-alipay' -%}<span class="visually-hidden">Alipay</span></a></li>
+              {%- endif -%}
+            </ul>            
+          </div>
+        </div>
+      {% endif %}
+
+<!-- End Payment icon  -->
+
+<!-- Start icon after text -->
+
+         {% if section.settings.richtext_data != blank %}
+            <div class="login__text has-padding-bottom">
+              {{ section.settings.richtext_data }}
+            </div>
+          {% endif %}
+
+<!-- End icon after text -->
+
+ <small class="text-align-center one-whole column is-flex is-align-center"><em>{{ 'customer.reregister.subtitle' | t }}</em></small>
+          
+          {% form 'create_customer' %}
+
+            {{ form.errors | default_errors }}
+
+          {% comment %} 
+            <div id="first_name" class="field{% if section.settings.showfirstname == false %} hidden{% endif %}">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.reregister.first_name' | t }}*</label>
+              <div class="control">
+                <input type="text" value="" name="customer[first_name]" id="first_name" class="input" size="30" placeholder="{{ 'customer.register.first_name' | t }}" required  />
+              </div>
+            </div>
+
+            <div id="last_name" class="field{% if section.settings.showlastname == false %} hidden{% endif %}">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.reregister.last_name' | t }}*</label>
+              <div class="control">
+                <input type="text" value="" name="customer[last_name]" id="last_name" class="input" size="30" placeholder="{{ 'customer.reregister.last_name' | t }}" required />
+              </div>
+            </div>
+          {% endcomment %} 
+            <div id="email" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.reregister.email' | t }}*</label>
+              <div class="control">
+                <input type="email" value="" name="customer[email]" id="email" class="input" size="30" placeholder="{{ 'customer.reregister.email' | t }}*" />
+              </div>
+            </div>
+
+            <div id="password" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.reregister.password' | t }}*</label>
+              <div class="control">
+                <input type="password" value="" name="customer[password]" id="password" class="input" size="30" placeholder="{{ 'customer.reregister.password' | t }}" />
+              </div>
+            </div>
+
+            <div class="is-flex is-justify-space-between">
+              <input class="button button--primary" type="submit" value="{{ 'customer.reregister.sign_up' | t }}" />
+              <p class="has-margin-left">* {{ 'general.forms.required_field' | t }}</p>
+            </div>
+
+            <p class="has-padding-top">
+              {%comment%}{{ 'customer.reregister.returning_customer_label' | t }} {%endcomment%}<a href="{{ routes.account_login_url }}" class="hoverButton">{{ 'customer.reregister.sign_in_html' | t }}</a>
+            </p>
+          {% endform %}
+        </div><!-- /#create-customer -->
+      </div>
+    </div>
+
+    {% if section.settings.image %}
+      <div class="register__image one-half medium-down--one-whole column is-order-aligned-{{ section.settings.image_position }}">
+        {% render 'image-element',
+                image: section.settings.image,
+                alt: section.settings.image.alt
+        %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Re-Register Form",
+    "class": "register-section",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "showfirstname",
+        "label": "Show first name",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "showlastname",
+        "label": "Show last name",
+        "default": false
+      },
+      {
+        "type": "richtext",
+        "id": "richtext",
+        "label": "Text"
+      },
+      {
+      "type": "checkbox",
+      "id": "display_payment_methods",
+      "label": "Show payment method icons",
+      "default": true
+      },
+      {
+	  "type": "url",
+	  "id": "payment_page_url",
+	  "label": "Payment page URL"
+	  },
+ 	  {
+      "type": "checkbox",
+      "id": "payment_enabled_visa",
+      "label": "Visa",
+      "default": true
+      },
+      {
+      "type": "checkbox",
+      "id": "payment_enabled_master",
+      "label": "Mastercard",
+      "default": true
+      },
+      {
+      "type": "checkbox",
+      "id": "payment_enabled_paypal",
+      "label": "Paypal",
+      "default": true
+      },
+      {
+      "type": "checkbox",
+      "id": "payment_enabled_american_express",
+      "label": "American Express",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enabled_jcb",
+      "label": "JCB",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enabled_shoppay",
+      "label": "Shop pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enabled_applepay",
+      "label": "Apple pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enabled_gpay",
+      "label": "Google pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enabled_alipay",
+      "label": "Alipay",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "richtext_data",
+      "label": "Text"
+    },  
+    {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+    },
+    {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "right"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

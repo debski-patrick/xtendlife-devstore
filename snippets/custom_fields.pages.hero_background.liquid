@@ -1,0 +1,9 @@
+{% if page.metafields["custom_fields"]["hero_background"] != blank %}
+  <div class="custom-field custom-field__hero-background custom-field__type--text">
+    <h3 class="custom-field--title">Hero Background</h3>
+    <div class="custom-field--value">
+      {{ page.metafields["custom_fields"]["hero_background"] }}
+
+    </div>
+  </div>
+{% endif %}

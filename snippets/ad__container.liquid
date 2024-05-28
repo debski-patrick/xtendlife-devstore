@@ -1,0 +1,13 @@
+{% assign ad_product = all_products[ad_handle] %}
+<div class="ad__container" data-handle="{{ ad_handle }}">
+  <div class="ad__product">
+    <div class="ad__product-content-wrapper">
+      <h2 class="ad__product-title">{{ ad_title }}</h2>
+      <p class="ad__product-description">{{ ad_description }}</p>
+      <a class="btn" href="{{ ad_product.url }}">Shop now</a>
+    </div>
+    <div class="ad__product-image-wrapper">
+      <img class="ad__product-image" src="{{ ad_product | img_url: '20x' }}" data-src="{{ ad_product | img_url: '500x' }}" alt="{{ product.title }}">
+    </div>
+  </div>
+</div>

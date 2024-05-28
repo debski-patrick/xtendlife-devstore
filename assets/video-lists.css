@@ -1,0 +1,82 @@
+.videos_page_list .vid-main-wrapper {
+	width: 100%;
+	background: #fff;
+	margin: 0 auto;
+	padding-top: 40px;
+	padding-bottom: 40px;
+  }
+  .videos_page_list .vid-container {
+      position: relative;
+      width: 64%;
+      float: left;
+   }
+  .videos_page_list .vid-container iframe, .videos_page_list .vid-container object, .videos_page_list .vid-container embed {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+  }
+  .videos_page_list .vid-list-container {
+	width: 36%;
+	height: 400px;
+	overflow: hidden;
+	overflow-y: auto;
+	float: right;
+	background: #E3EBF6;
+  }
+  .videos_page_list ol#vid-list {
+	margin: 0;
+	padding: 0;
+  }
+  .videos_page_list ol#vid-list li {
+	list-style: none;
+	display: block;
+  }
+  .videos_page_list ol#vid-list li a {
+	text-decoration: none;
+	display: block;
+	padding: 10px 0 10px 10px;
+	cursor: pointer;
+  }
+  .videos_page_list .vid-thumb {
+	display: inline-block;
+	margin-right: 8px;
+	width: 20%;
+	vertical-align: top;
+  }
+  .videos_page_list #vid-list .desc {
+	color: #000;
+	font-size: 13px;
+	display: inline-block;
+	width: 71%;
+	vertical-align: top;
+  }
+  .videos_page_list .btton_subscription {
+	text-align: center;
+  }
+  @media only screen and (min-width: 1310px){
+    .max-width-container {
+      padding-left: 0em;
+      padding-right: 0em;
+    }
+  }
+  @media only screen and (min-width: 480px){
+    .videos_page_list .vid-main-wrapper {
+      max-width: 1100px;
+      min-width: 440px;
+    }
+  }
+  @media only screen and (max-width: 991px){
+      .videos_page_list .vid-container {
+    	width: 100%;
+    }
+      .videos_page_list .vid-list-container {
+    	width: 100%;
+    	height: 300px;
+    }
+    .videos_page_list .vid-thumb {
+      vertical-align: middle;
+      width: auto;
+    }
+  }

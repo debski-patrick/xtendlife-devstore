@@ -1,0 +1,34 @@
+<section class="ingredient-cards js-filterable container" data-filter-name="ingredients">
+
+    {% assign articles = blog.articles | sort: 'title' %}
+    {% for article in articles %}
+  
+      {% assign first_letter = article.title | slice: 0 | upcase %}
+      {% if first_letter == '0' or first_letter == '1' or first_letter == '2' or first_letter == '3' or first_letter == '4' or first_letter == '5' or first_letter == '6' or first_letter == '7' or first_letter == '8' or first_letter == '9' %}
+        {% assign first_letter = '0-9' %}
+      {% endif %}
+      <div class="ingredient-card js-ingredient-card column two-sixths large-down--eight {% unless first_letter == 'A' %}hide{% endunless %}" data-filter-letter="{{ first_letter }}" data-handle="{{ article.handle }}">
+        <div class="ingredient-card__info">
+          <a href="{{ article.url }}">
+            <figure class="ingredient-card__image">
+              
+              <!-- {% render 'image-element',
+                                image: article.image,
+                                alt: article.image.alt,
+                                 crop: center
+                        %} -->
+             <img src=" {{ article.image | img_url: '150x150', crop: 'center' }}">
+
+            </figure>
+          </a>
+          <div class="ingredient-card__details">
+            <h2 class="ingredient-card__title"><a class="ingredient-card__title--link" href="{{ article.url }}">{{ article.title }}</a></h2>
+            <p class="ingredient-card__excerpt">{{ article.excerpt  | strip_html | truncate: 100 }}</p>
+            
+          </div>
+        </div>
+        <!-- <div class="ingredient-card__products js-ingredient-products"></div> -->
+      </div>
+    {% endfor %}
+  
+  </section>

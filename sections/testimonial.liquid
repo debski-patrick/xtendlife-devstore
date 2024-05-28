@@ -1,0 +1,361 @@
+<link rel="preload" href="{{ 'testimonial.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'testimonial.css' | asset_url }}">
+
+<link rel="preload" href="{{ 'slick.css' | asset_url }}" as="style">
+<link rel="stylesheet" href="{{ 'slick.css' | asset_url }}">
+
+<style>
+  .review-carousel__rating {
+    justify-content: {{ section.settings.text_alignment }};
+  }
+  .quotes-slider__text h2{
+    color: {{ section.settings.heading_color }};
+  }
+  .rte-message.rte p{
+    color: {{ section.settings.content_color }};
+  }
+  .author_name_title{
+    color: {{ section.settings.author_color }};
+  }
+  .quotes-category .slick-dots li{
+    background-color: {{ section.settings.dots_bg }} ;
+  }
+  .quotes-category .slick-dots li.slick-active {
+	background-color: {{ section.settings.dotsactive_bg }} ;
+	opacity: 1;
+  }
+  {% if section.settings.author_tick %} 
+  .author_name_title {
+	display: flex;
+    align-items: center;
+  }
+  .author_name_title span {
+	margin-left: 5px;
+  }
+  {% endif %}
+  {% if section.settings.enable_overlay %}
+    .quotes-slider__text {
+      opacity: 0.8;
+    }
+  .slick-active.slick-center .quotes-slider__text {
+	opacity: 1;
+  }
+  .quotes-category .slick-dots li{
+    opacity: 0.7;
+  }
+  {% endif %}
+  </style>
+<section class="section-testimonial" {% if section.settings.section_bg != blank %}style="background-image: url({{ section.settings.section_bg | img_url: "master" }});" {% else %} style="background: {{ section.settings.background_bg }}" {% endif %}>
+  <div class="section_new" data-section-id="{{ section.id }}" data-section-type="quotes">
+    {% if section.settings.title != blank %}
+      <div class="quote_section-header">
+        <div class="review-carousel__rating_title">
+          <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+          <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+          <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+          <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+          <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+        </div>
+        <h2>{{ section.settings.title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <div class="quotes-wrapper">
+        <div class="quotes-category container" data-count="{{ section.blocks.size }}" {{ block.shopify_attributes }}>
+          {%- for block in section.blocks -%}
+          <div class="col-md-4 col-sm-12 col-xs-12 column">           
+            <div class="quotes-slider__text text-{{ section.settings.text_alignment }}" {% if section.settings.review_block_bg != blank %} style="background: {{ section.settings.review_block_bg }}" {% endif %} aria-label="{{ block.settings.title | escape }}">
+
+              <div class="review-carousel__rating">
+                {% if block.settings.rating == 1.5 %}
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-half' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                {% elsif block.settings.rating == 2.5 %}
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-half' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                {% elsif block.settings.rating == 3.5 %}
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-half' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                {% elsif block.settings.rating == 4.5 %}
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                <i class="review-carousel__star">{% render 'svg-star-half' %}</i>
+                {% else %}          
+
+                {% for i in (1..block.settings.rating) %}
+                <i class="review-carousel__star">{% render 'svg-star-filled' %}</i>
+                {% endfor %}
+
+                {% assign remaining_stars = 5 | minus: block.settings.rating %}
+
+                {% for i in (1..remaining_stars) %}
+                <i class="review-carousel__star">{% render 'svg-star-empty' %}</i>
+                {% endfor %}
+                {% endif %}
+
+              </div>
+                {% if block.settings.title != blank %}
+                 <h2 class="rte-title rte">{{ block.settings.title }}</h2>
+                {% endif %}
+              {% if block.settings.quote != blank %}
+                <div class="rte-message rte">{{ block.settings.quote }}</div>
+              {% endif %}
+                {% if block.settings.author != blank %}
+                  <p class="author_name_title ">{{ block.settings.author | escape }}
+                  {% if section.settings.author_tick %} 
+                    <span><img src="{{ 'author_tick.png' | file_url }}"></span>
+                  {% endif %}
+                  </p>
+                {% endif %}
+               {% if block.settings.featured_product != blank %}
+                {%- assign featured_product = block.settings.featured_product -%}
+                <div class="review_product">
+                 <h3>{{ featured_product.title }}</h3>
+                  <a class="product_testimonial_btn" href="{{ featured_product.url }}">Shop Now</a>
+                </div>
+              {% endif %} 
+                
+            </div>
+          </div>
+          {%- endfor -%} 
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "class": "index-section",
+  "settings": [
+	{
+	  "type": "image_picker",
+	  "id": "section_bg",
+	  "label": "Background image"
+	},
+    	{
+	  "type": "color",
+	  "id": "background_bg",
+	  "label": "Background Color"
+	},
+    	{
+	  "type": "color",
+	  "id": "review_block_bg",
+	  "label": "Review block color",
+       "default": "#e8e8e8"
+	},
+    {
+	  "type": "color",
+	  "id": "dots_bg",
+	  "label": "Slider dots color",
+       "default": "#00a9d5"
+	},
+    {
+	  "type": "color",
+	  "id": "dotsactive_bg",
+	  "label": "Slider active dots color",
+       "default": "#005895"
+	},
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Testimonials"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Enable overlay block"
+    },
+    {
+      "type": "checkbox",
+      "id": "author_tick",
+      "label": "Enable author tick image"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+	  "type": "color",
+	  "id": "heading_color",
+	  "label": "Heading Color",
+      "default": "#005895"
+	},
+     {
+	  "type": "color",
+	  "id": "content_color",
+	  "label": "Content Color",
+      "default": "#005895"
+	},
+     {
+	  "type": "color",
+	  "id": "author_color",
+	  "label": "Author Color",
+      "default": "#231f20"
+	}
+  ],
+  "blocks": [
+    {
+      "type": "supplements",
+      "name": "Supplements Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+		  "default": "Supplements"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Text",
+          "default": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 0.5,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Author's name"
+        },
+        {
+          "type": "product",
+          "id": "featured_product",
+          "label": "Select Product"
+        }
+      ]
+    },
+	{
+      "type": "skincare",
+      "name": "Skincare Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+		  "default": "Skincare"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Text",
+          "default": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Author's name"
+        },
+        {
+          "type": "product",
+          "id": "featured_product",
+          "label": "Select Product"
+        }
+      ]
+    },
+	{
+      "type": "service",
+      "name": "Service Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+		  "default": "Service"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Text",
+          "default": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Author's name"
+        },
+        {
+          "type": "product",
+          "id": "featured_product",
+          "label": "Select Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "category": "Text",
+      "blocks": [
+        {
+          "type": "supplements"
+        },
+        {
+          "type": "skincare"
+        },
+        {
+          "type": "service"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

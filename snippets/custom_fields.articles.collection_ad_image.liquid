@@ -1,0 +1,8 @@
+{% if article.metafields["custom_fields"]["collection_ad_image"] != blank %}
+  <div class="custom-field custom-field__collection-ad-image custom-field__type--image">
+    <h3 class="custom-field--title">Collection Ad Image</h3>
+    <div class="custom-field--value">  
+      {% render 'cf-image' with image: article.metafields["custom_fields"]["collection_ad_image"] %}
+    </div>
+  </div>
+{% endif %}
